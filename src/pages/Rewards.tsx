@@ -4,12 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/context/UserContext";
 import { showError, showSuccess } from "@/utils/toast";
-
-const rewards = [
-  { id: 1, name: "Bus Ticket", cost: 100 },
-  { id: 2, name: "Market Voucher", cost: 250 },
-  { id: 3, name: "Coffee Coupon", cost: 50 },
-];
+import { rewards } from "@/data/rewards";
 
 const RewardsPage = () => {
   const { points, spendPoints } = useUser();
