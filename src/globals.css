@@ -91,7 +91,27 @@
 
   body {
     @apply bg-background text-foreground;
-    background-image: radial-gradient(hsl(var(--primary) / 0.05) 1px, transparent 1px);
-    background-size: 16px 16px;
+    position: relative;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: url('/background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.05;
+    z-index: -1;
+    filter: invert(1);
+  }
+
+  .dark body::before {
+    opacity: 0.1;
+    filter: invert(0);
   }
 }
