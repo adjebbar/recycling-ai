@@ -10,6 +10,7 @@ import { Recycle, ScanLine } from "lucide-react";
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import CommunityImpact from "@/components/CommunityImpact";
+import RecyclingBenefits from "@/components/RecyclingBenefits";
 
 const Index = () => {
   const { points } = useUser();
@@ -56,6 +57,8 @@ const Index = () => {
         </Link>
 
         <CommunityImpact />
+
+        <RecyclingBenefits />
       </div>
     </div>
   );
