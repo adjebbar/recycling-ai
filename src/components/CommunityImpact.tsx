@@ -2,12 +2,14 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAnimatedCounter } from "@/hooks/useAnimatedCounter";
+import { useUser } from "@/context/UserContext";
 import { Users, Recycle } from "lucide-react";
 
 const CommunityImpact = () => {
-  // Mock data for demonstration
-  const totalBottlesRecycled = useAnimatedCounter(125432, 1500);
-  const communityMembers = useAnimatedCounter(876, 1500);
+  const { totalBottlesRecycled, activeRecyclers } = useUser();
+  
+  const animatedBottles = useAnimatedCounter(totalBottlesRecycled, 1000);
+  const animatedRecyclers = useAnimatedCounter(activeRecyclers, 1000);
 
   return (
     <div className="mt-16 text-center">
@@ -21,7 +23,7 @@ const CommunityImpact = () => {
             <Recycle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalBottlesRecycled.toLocaleString()}</div>
+            <div className="text-2xl font-bold">{animatedBottles.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
               Making a difference, one bottle at a time.
             </p>
@@ -35,7 +37,7 @@ const CommunityImpact = () => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{communityMembers.toLocaleString()}</div>
+            <div className="text-2xl font-bold">{animatedRecyclers.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
               Join our growing community!
             </p>
