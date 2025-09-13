@@ -9,6 +9,7 @@ import { useAnimatedCounter } from "@/hooks/useAnimatedCounter";
 import { Recycle, ScanLine } from "lucide-react";
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
+import CommunityImpact from "@/components/CommunityImpact";
 
 const Index = () => {
   const { points } = useUser();
@@ -53,6 +54,8 @@ const Index = () => {
             Start Scanning
           </Button>
         </Link>
+
+        <CommunityImpact />
       </div>
     </div>
   );
