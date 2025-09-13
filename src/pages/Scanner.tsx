@@ -11,27 +11,29 @@ import { Button } from '@/components/ui/button';
 
 const POINTS_PER_BOTTLE = 10;
 
-// List of tags that identify a plastic bottle
-const plasticBottleTags = [
-  'en:plastic-bottle',
-  'fr:bouteille-en-plastique',
-];
+// Définir la structure d'un article d'emballage de l'API
+interface Packaging {
+  material?: string;
+  shape?: string;
+}
 
-const isPlasticBottle = (tags: string[]): boolean => {
-  if (!tags || tags.length === 0) return false;
-
-  // Check for specific, reliable tags first
-  if (tags.some(tag => plasticBottleTags.includes(tag))) {
-    return true;
+// Fonction mise à jour pour vérifier les bouteilles en plastique en fonction des détails de l'emballage
+const isPlasticBottle = (packagings: Packaging[]): boolean => {
+  if (!packagings || packagings.length === 0) {
+    return false;
   }
 
-  // Fallback for more generic tags
-  const hasPlastic = tags.some(tag => tag.includes('plastic'));
-  const hasBottle = tags.some(tag => tag.includes('bottle') || tag.includes('bouteille'));
-  const hasGlass = tags.some(tag => tag.includes('glass') || tag.includes('verre'));
+  // Vérifier si un article d'emballage est une bouteille faite d'un matériau plastique
+  return packagings.some(pkg => {
+    const shape = pkg.shape?.toLowerCase() || '';
+    const material = pkg.material?.toLowerCase() || '';
 
-  // It's a plastic bottle if it has plastic and bottle tags, but not glass
-  return hasPlastic && hasBottle && !hasGlass;
+    const isBottleShape = shape.includes('bottle') || shape.includes('bouteille');
+    const isPlasticMaterial = material.includes('plastic') || material.includes('pet') || material.includes('hdpe');
+    const isNotGlass = !material.includes('glass') && !material.includes('verre');
+
+    return isBottleShape && isPlasticMaterial && isNotGlass;
+  });
 };
 
 
@@ -48,7 +50,7 @@ const ScannerPage = () => {
     }
     
     setLastScanned(barcode);
-    const loadingToast = showLoading('Checking barcode...');
+    const loadingToast = showLoading('Vérification du code-barres...');
 
     try {
       const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
@@ -57,20 +59,20 @@ const ScannerPage = () => {
       dismissToast(loadingToast);
 
       if (data.status === 1 && data.product) {
-        const tags = data.product.packaging_tags || [];
-        if (isPlasticBottle(tags)) {
+        const packagings = data.product.packagings || [];
+        if (isPlasticBottle(packagings)) {
           addPoints(POINTS_PER_BOTTLE);
-          showSuccess(`Plastic bottle detected! +${POINTS_PER_BOTTLE} points.`);
+          showSuccess(`Bouteille en plastique détectée ! +${POINTS_PER_BOTTLE} points.`);
         } else {
-          showError('This item is not a recognized plastic bottle.');
+          showError("Cet article n'est pas une bouteille en plastique reconnue.");
         }
       } else {
-        showError('Product not found in the database.');
-        // Here we would add logic to save the new product.
+        showError('Produit non trouvé dans la base de données.');
+        // Ici, nous ajouterions la logique pour enregistrer le nouveau produit.
       }
     } catch (err) {
       dismissToast(loadingToast);
-      showError('Could not connect to the product database.');
+      showError('Impossible de se connecter à la base de données des produits.');
       console.error(err);
     } finally {
       setTimeout(() => setLastScanned(null), 3000);
@@ -96,8 +98,8 @@ const ScannerPage = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4 text-center">Scan Barcode</h1>
-      <p className="text-muted-foreground text-center mb-6">Center a product's barcode in the frame to scan it.</p>
+      <h1 className="text-3xl font-bold mb-4 text-center">Scanner le code-barres</h1>
+      <p className="text-muted-foreground text-center mb-6">Centrez le code-barres d'un produit dans le cadre pour le scanner.</p>
       
       <Card className="max-w-lg mx-auto overflow-hidden">
         <CardContent className="p-0">
@@ -117,17 +119,17 @@ const ScannerPage = () => {
 
       <Card className="max-w-lg mx-auto mt-6">
         <CardHeader>
-          <CardTitle>Or Enter Barcode Manually</CardTitle>
+          <CardTitle>Ou entrez le code-barres manuellement</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleManualSubmit} className="flex space-x-2">
             <Input
               type="text"
-              placeholder="Enter barcode number"
+              placeholder="Entrez le numéro du code-barres"
               value={manualBarcode}
               onChange={(e) => setManualBarcode(e.target.value)}
             />
-            <Button type="submit">Check</Button>
+            <Button type="submit">Vérifier</Button>
           </form>
         </CardContent>
       </Card>
@@ -135,7 +137,7 @@ const ScannerPage = () => {
       <div className="text-center mt-6">
         <p className="text-sm text-muted-foreground flex items-center justify-center">
           <CameraOff className="w-4 h-4 mr-2" />
-          If the camera doesn't appear, please grant camera permissions in your browser settings.
+          Si la caméra n'apparaît pas, veuillez autoriser l'accès à la caméra dans les paramètres de votre navigateur.
         </p>
       </div>
     </div>
