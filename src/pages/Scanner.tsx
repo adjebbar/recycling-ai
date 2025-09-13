@@ -6,6 +6,8 @@ import { useUser } from '@/context/UserContext';
 import { showError, showSuccess, showLoading, dismissToast } from '@/utils/toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CameraOff } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 const POINTS_PER_BOTTLE = 10;
 
@@ -36,50 +38,60 @@ const isPlasticBottle = (tags: string[]): boolean => {
 const ScannerPage = () => {
   const { addPoints } = useUser();
   const [lastScanned, setLastScanned] = useState<string | null>(null);
+  const [manualBarcode, setManualBarcode] = useState('');
 
-  const handleScanResult = async (result: any, error: any) => {
+  const processBarcode = async (barcode: string) => {
+    if (!barcode) return;
+
+    if (barcode === lastScanned) {
+      return;
+    }
+    
+    setLastScanned(barcode);
+    const loadingToast = showLoading('Checking barcode...');
+
+    try {
+      const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
+      const data = await response.json();
+
+      dismissToast(loadingToast);
+
+      if (data.status === 1 && data.product) {
+        const tags = data.product.packaging_tags || [];
+        if (isPlasticBottle(tags)) {
+          addPoints(POINTS_PER_BOTTLE);
+          showSuccess(`Plastic bottle detected! +${POINTS_PER_BOTTLE} points.`);
+        } else {
+          showError('This item is not a recognized plastic bottle.');
+        }
+      } else {
+        showError('Product not found in the database.');
+        // Here we would add logic to save the new product.
+      }
+    } catch (err) {
+      dismissToast(loadingToast);
+      showError('Could not connect to the product database.');
+      console.error(err);
+    } finally {
+      setTimeout(() => setLastScanned(null), 3000);
+    }
+  };
+
+  const handleScanResult = (result: any, error: any) => {
     if (!!result) {
       const barcode = result.getText();
-      
-      // Avoid processing the same barcode multiple times in a row
-      if (barcode === lastScanned) {
-        return;
-      }
-      
-      setLastScanned(barcode);
-      const loadingToast = showLoading('Checking barcode...');
-
-      try {
-        const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
-        const data = await response.json();
-
-        dismissToast(loadingToast);
-
-        if (data.status === 1 && data.product) {
-          const tags = data.product.packaging_tags || [];
-          if (isPlasticBottle(tags)) {
-            addPoints(POINTS_PER_BOTTLE);
-            showSuccess(`Plastic bottle detected! +${POINTS_PER_BOTTLE} points.`);
-          } else {
-            showError('This item is not a recognized plastic bottle.');
-          }
-        } else {
-          showError('Product not found in the database.');
-        }
-      } catch (err) {
-        dismissToast(loadingToast);
-        showError('Could not connect to the product database.');
-        console.error(err);
-      } finally {
-        // Allow scanning the same barcode again after a delay
-        setTimeout(() => setLastScanned(null), 3000);
-      }
+      processBarcode(barcode);
     }
 
     if (!!error) {
-      // You can log errors here if needed
       // console.info(error);
     }
+  };
+
+  const handleManualSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    processBarcode(manualBarcode.trim());
+    setManualBarcode('');
   };
 
   return (
@@ -102,6 +114,24 @@ const ScannerPage = () => {
           />
         </CardContent>
       </Card>
+
+      <Card className="max-w-lg mx-auto mt-6">
+        <CardHeader>
+          <CardTitle>Or Enter Barcode Manually</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleManualSubmit} className="flex space-x-2">
+            <Input
+              type="text"
+              placeholder="Enter barcode number"
+              value={manualBarcode}
+              onChange={(e) => setManualBarcode(e.target.value)}
+            />
+            <Button type="submit">Check</Button>
+          </form>
+        </CardContent>
+      </Card>
+
       <div className="text-center mt-6">
         <p className="text-sm text-muted-foreground flex items-center justify-center">
           <CameraOff className="w-4 h-4 mr-2" />
