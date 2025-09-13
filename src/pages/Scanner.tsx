@@ -4,10 +4,11 @@ import { useState } from 'react';
 import { QrReader } from 'react-qr-reader';
 import { useUser } from '@/context/UserContext';
 import { showError, showSuccess, showLoading, dismissToast } from '@/utils/toast';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CameraOff } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Camera, CameraOff, Keyboard } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const POINTS_PER_BOTTLE = 10;
 
@@ -97,44 +98,62 @@ const ScannerPage = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4 text-center">Scanner le code-barres</h1>
-      <p className="text-muted-foreground text-center mb-6">Centrez le code-barres d'un produit dans le cadre pour le scanner.</p>
+    <div className="container mx-auto p-4 flex flex-col items-center">
+      <div className="text-center max-w-lg w-full">
+        <h1 className="text-3xl font-bold mb-4">Scanner le code-barres</h1>
+        <p className="text-muted-foreground mb-6">Choisissez une méthode pour scanner le code-barres d'un produit.</p>
+      </div>
       
-      <Card className="max-w-lg mx-auto overflow-hidden">
-        <CardContent className="p-0">
-          <QrReader
-            onResult={handleScanResult}
-            constraints={{ facingMode: 'environment' }}
-            videoContainerStyle={{ paddingTop: '75%' }} // 4:3 aspect ratio
-            videoStyle={{ objectFit: 'cover' }}
-            ViewFinder={() => (
-              <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
-                <div className="w-3/4 h-1/2 border-4 border-white/50 rounded-lg shadow-lg" />
-              </div>
-            )}
-          />
-        </CardContent>
-      </Card>
+      <Tabs defaultValue="camera" className="w-full max-w-lg">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="camera">
+            <Camera className="mr-2 h-4 w-4" />
+            Caméra
+          </TabsTrigger>
+          <TabsTrigger value="manual">
+            <Keyboard className="mr-2 h-4 w-4" />
+            Manuel
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="camera">
+          <Card className="overflow-hidden">
+            <CardContent className="p-0">
+              <QrReader
+                onResult={handleScanResult}
+                constraints={{ facingMode: 'environment' }}
+                videoContainerStyle={{ paddingTop: '75%' }} // 4:3 aspect ratio
+                videoStyle={{ objectFit: 'cover' }}
+                ViewFinder={() => (
+                  <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
+                    <div className="w-3/4 h-1/2 border-4 border-white/50 rounded-lg shadow-lg" />
+                  </div>
+                )}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="manual">
+          <Card>
+            <CardHeader>
+              <CardTitle>Entrez le code-barres</CardTitle>
+              <CardDescription>Entrez le numéro sous le code-barres et cliquez sur Vérifier.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleManualSubmit} className="flex space-x-2">
+                <Input
+                  type="text"
+                  placeholder="Entrez le numéro du code-barres"
+                  value={manualBarcode}
+                  onChange={(e) => setManualBarcode(e.target.value)}
+                />
+                <Button type="submit">Vérifier</Button>
+              </form>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
-      <Card className="max-w-lg mx-auto mt-6">
-        <CardHeader>
-          <CardTitle>Ou entrez le code-barres manuellement</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleManualSubmit} className="flex space-x-2">
-            <Input
-              type="text"
-              placeholder="Entrez le numéro du code-barres"
-              value={manualBarcode}
-              onChange={(e) => setManualBarcode(e.target.value)}
-            />
-            <Button type="submit">Vérifier</Button>
-          </form>
-        </CardContent>
-      </Card>
-
-      <div className="text-center mt-6">
+      <div className="text-center mt-6 max-w-lg w-full">
         <p className="text-sm text-muted-foreground flex items-center justify-center">
           <CameraOff className="w-4 h-4 mr-2" />
           Si la caméra n'apparaît pas, veuillez autoriser l'accès à la caméra dans les paramètres de votre navigateur.
