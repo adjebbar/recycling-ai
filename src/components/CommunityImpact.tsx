@@ -13,7 +13,7 @@ const CommunityImpact = () => {
     <div className="mt-16 text-center">
       <h2 className="text-3xl font-bold mb-6">Community Impact</h2>
       <div className="grid gap-6 md:grid-cols-2 max-w-2xl mx-auto">
-        <Card>
+        <Card className="bg-card/80 backdrop-blur-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Total Bottles Recycled
@@ -27,7 +27,7 @@ const CommunityImpact = () => {
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-card/80 backdrop-blur-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Active Recyclers

@@ -56,7 +56,7 @@ const RecyclingBenefits = () => {
     <div className="mt-16 text-center">
       <h2 className="text-3xl font-bold mb-6">Why Recycle?</h2>
       <Card className={cn(
-        "max-w-2xl mx-auto transition-opacity duration-500",
+        "max-w-2xl mx-auto transition-opacity duration-500 bg-card/80 backdrop-blur-sm",
         isFading ? "opacity-0" : "opacity-100"
       )}>
         <CardHeader className="flex flex-row items-center space-x-4 pb-2">

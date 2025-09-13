@@ -40,7 +40,7 @@ const Index = () => {
             </Link>
           </div>
           <div className="space-y-6">
-            <Card className="w-full">
+            <Card className="w-full bg-card/80 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle>Your Points</CardTitle>
               </CardHeader>
@@ -50,7 +50,7 @@ const Index = () => {
             </Card>
 
             {nextReward && (
-              <Card className="w-full">
+              <Card className="w-full bg-card/80 backdrop-blur-sm">
                 <CardHeader>
                   <CardTitle>Next Reward</CardTitle>
                 </CardHeader>

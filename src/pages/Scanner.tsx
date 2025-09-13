@@ -116,7 +116,7 @@ const ScannerPage = () => {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="camera">
-          <Card className="overflow-hidden">
+          <Card className="overflow-hidden bg-card/80 backdrop-blur-sm">
             <CardContent className="p-0">
               <QrReader
                 onResult={handleScanResult}
@@ -133,7 +133,7 @@ const ScannerPage = () => {
           </Card>
         </TabsContent>
         <TabsContent value="manual">
-          <Card>
+          <Card className="bg-card/80 backdrop-blur-sm">
             <CardHeader>
               <CardTitle>Entrez le code-barres</CardTitle>
               <CardDescription>Entrez le numéro sous le code-barres et cliquez sur Vérifier.</CardDescription>

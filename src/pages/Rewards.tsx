@@ -34,7 +34,7 @@ const RewardsPage = () => {
           const Icon = reward.icon || Gift;
           const canRedeem = points >= reward.cost;
           return (
-            <Card key={reward.id} className="flex flex-col">
+            <Card key={reward.id} className="flex flex-col bg-card/80 backdrop-blur-sm">
               <CardHeader className="flex-row gap-4 items-center">
                 <Icon className="w-10 h-10 text-primary" />
                 <div>
