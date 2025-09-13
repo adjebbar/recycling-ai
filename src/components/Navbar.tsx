@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Package, ScanLine, Trophy } from 'lucide-react';
 import { useUser } from '@/context/UserContext';
 import { Button } from '@/components/ui/button';
+import { ThemeToggle } from './theme-toggle';
 
 export const Navbar = () => {
   const { points } = useUser();
@@ -33,6 +34,7 @@ export const Navbar = () => {
         </nav>
         <div className="flex items-center justify-end space-x-4">
           <span className="font-semibold">{points} Points</span>
+          <ThemeToggle />
         </div>
       </div>
     </header>
