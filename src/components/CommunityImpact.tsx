@@ -10,7 +10,7 @@ const CommunityImpact = () => {
   const communityMembers = useAnimatedCounter(876, 1500);
 
   return (
-    <div className="mt-16">
+    <div className="mt-16 text-center">
       <h2 className="text-3xl font-bold mb-6">Community Impact</h2>
       <div className="grid gap-6 md:grid-cols-2 max-w-2xl mx-auto">
         <Card>
