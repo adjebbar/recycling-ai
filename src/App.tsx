@@ -20,6 +20,7 @@ import { ThemeProvider } from "./components/theme-provider";
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 import { DailyBonus } from "./components/DailyBonus";
+import { ConfettiProvider } from "./components/ConfettiProvider";
 
 const queryClient = new QueryClient();
 
@@ -71,10 +72,12 @@ const App = () => {
       <TooltipProvider>
         <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
           <Toaster />
-          <Sonner />
+          <Sonner position="top-center" />
           <BrowserRouter>
             <AuthProvider>
-              <AppContent />
+              <ConfettiProvider>
+                <AppContent />
+              </ConfettiProvider>
             </AuthProvider>
           </BrowserRouter>
         </ThemeProvider>

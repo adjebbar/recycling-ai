@@ -14,11 +14,10 @@ import ActivityChart from "@/components/ActivityChart";
 
 const ProfilePage = () => {
   const { t } = useTranslation();
-  const { user, points } = useAuth();
+  const { user, points, totalScans } = useAuth();
   const { data: scanHistory, isLoading } = useProfileData();
   const animatedPoints = useAnimatedCounter(points);
-
-  const totalScans = scanHistory?.length ?? 0;
+  const animatedTotalScans = useAnimatedCounter(totalScans);
 
   return (
     <div className="container mx-auto p-4 animate-fade-in-up">
@@ -41,7 +40,7 @@ const ProfilePage = () => {
             <CardTitle>{t('profile.bottlesRecycled')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-bold">{totalScans.toLocaleString()}</p>
+            <p className="text-4xl font-bold">{animatedTotalScans.toLocaleString()}</p>
           </CardContent>
         </Card>
       </div>

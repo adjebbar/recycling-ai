@@ -5,6 +5,8 @@ import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabaseClient';
 import { showError, showSuccess } from '@/utils/toast';
 import { isBefore, startOfToday } from 'date-fns';
+import { useConfetti } from '@/components/ConfettiProvider';
+import { achievementsList } from '@/lib/achievements';
 
 const DAILY_BONUS_AMOUNT = 20;
 
@@ -12,6 +14,7 @@ interface AuthContextType {
   session: Session | null;
   user: User | null;
   points: number;
+  totalScans: number;
   totalBottlesRecycled: number;
   activeRecyclers: number;
   isBonusModalOpen: boolean;
@@ -34,9 +37,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isBonusModalOpen, setIsBonusModalOpen] = useState(false);
 
   const [points, setPoints] = useState(0);
+  const [totalScans, setTotalScans] = useState(0);
   const [anonymousPoints, setAnonymousPoints] = useState(0);
   const [totalBottlesRecycled, setTotalBottlesRecycled] = useState(0);
   const [activeRecyclers, setActiveRecyclers] = useState(0);
+  const { fire: fireConfetti } = useConfetti();
 
   const fetchCommunityStats = useCallback(async () => {
     const { data, error } = await supabase
@@ -54,17 +59,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const fetchUserProfile = useCallback(async (currentUser: User) => {
-    const { data, error } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('points, last_login')
       .eq('id', currentUser.id)
       .single();
 
-    if (error) {
-      console.error('Error fetching user profile:', error);
+    if (profileError) {
+      console.error('Error fetching user profile:', profileError);
       return null;
     }
-    return data;
+
+    const { count, error: countError } = await supabase
+      .from('scan_history')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', currentUser.id);
+    
+    if (countError) {
+      console.error('Error fetching scan count:', countError);
+      return { ...profile, totalScans: 0 };
+    }
+
+    return { ...profile, totalScans: count ?? 0 };
   }, []);
 
   useEffect(() => {
@@ -76,10 +92,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(currentUser);
 
       if (currentUser) {
-        const profile = await fetchUserProfile(currentUser);
-        if (profile) {
-          setPoints(profile.points);
-          const lastLogin = profile.last_login ? new Date(profile.last_login) : null;
+        const profileAndStats = await fetchUserProfile(currentUser);
+        if (profileAndStats) {
+          setPoints(profileAndStats.points);
+          setTotalScans(profileAndStats.totalScans);
+          const lastLogin = profileAndStats.last_login ? new Date(profileAndStats.last_login) : null;
           if (!lastLogin || isBefore(lastLogin, startOfToday())) {
             setIsBonusModalOpen(true);
           }
@@ -100,8 +117,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       if (newUser && !oldUser) {
         const localPoints = Number(localStorage.getItem('anonymousPoints') || '0');
-        const profile = await fetchUserProfile(newUser);
-        let currentPoints = profile?.points || 0;
+        const profileAndStats = await fetchUserProfile(newUser);
+        let currentPoints = profileAndStats?.points || 0;
 
         if (localPoints > 0) {
           showSuccess(`Merging ${localPoints} saved points to your account!`);
@@ -111,13 +128,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setAnonymousPoints(0);
         }
         setPoints(currentPoints);
+        setTotalScans(profileAndStats?.totalScans || 0);
         
-        const lastLogin = profile?.last_login ? new Date(profile.last_login) : null;
+        const lastLogin = profileAndStats?.last_login ? new Date(profileAndStats.last_login) : null;
         if (!lastLogin || isBefore(lastLogin, startOfToday())) {
           setIsBonusModalOpen(true);
         }
       } else if (!newUser && oldUser) {
         setPoints(0);
+        setTotalScans(0);
       }
       
       setSession(session);
@@ -137,15 +156,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     if (user) {
+      const oldStats = { points, totalScans };
       const newPoints = points + amount;
+      const newTotalScans = totalScans + 1;
+
       setPoints(newPoints);
+      setTotalScans(newTotalScans);
+
       const { error } = await supabase.from('profiles').update({ points: newPoints }).eq('id', user.id);
       if (error) {
         setPoints(points);
+        setTotalScans(totalScans);
         showError("Failed to update your points.");
         return;
       }
       await supabase.from('scan_history').insert({ user_id: user.id, points_earned: amount, product_barcode: barcode });
+
+      const newStats = { points: newPoints, totalScans: newTotalScans };
+      achievementsList.forEach(achievement => {
+        if (!achievement.condition(oldStats) && achievement.condition(newStats)) {
+          fireConfetti();
+          showSuccess("🎉 Achievement Unlocked! 🎉");
+        }
+      });
     } else {
       const newAnonymousPoints = anonymousPoints + amount;
       setAnonymousPoints(newAnonymousPoints);
@@ -197,6 +230,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     session,
     user,
     points: user ? points : anonymousPoints,
+    totalScans: user ? totalScans : 0,
     totalBottlesRecycled,
     activeRecyclers,
     isBonusModalOpen,
