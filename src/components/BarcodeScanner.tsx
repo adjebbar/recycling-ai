@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect } from 'react';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import { useEffect, useRef } from 'react';
+import { Html5QrcodeScanner, Html5QrcodeScannerState } from 'html5-qrcode';
 
 interface BarcodeScannerProps {
   onScanSuccess: (decodedText: string) => void;
@@ -9,26 +9,49 @@ interface BarcodeScannerProps {
 }
 
 const BarcodeScanner = ({ onScanSuccess, onScanFailure }: BarcodeScannerProps) => {
+  const scannerRef = useRef<Html5QrcodeScanner | null>(null);
+  
+  const callbacksRef = useRef({ onScanSuccess, onScanFailure });
+  callbacksRef.current = { onScanSuccess, onScanFailure };
+
   useEffect(() => {
-    const scanner = new Html5QrcodeScanner(
-      'reader', // The ID of the div element
-      {
-        fps: 10,
-        qrbox: { width: 250, height: 150 },
-        supportedScanTypes: [0], // 0 represents CODE_128, EAN_13, etc.
-      },
-      false // verbose
-    );
+    if (!scannerRef.current) {
+      const scanner = new Html5QrcodeScanner(
+        'reader',
+        {
+          fps: 10,
+          qrbox: { width: 250, height: 150 },
+          supportedScanTypes: [0],
+        },
+        false
+      );
 
-    scanner.render(onScanSuccess, onScanFailure);
+      const successCallback = (decodedText: string) => {
+        callbacksRef.current.onScanSuccess(decodedText);
+      };
 
-    // Cleanup function to stop the scanner when the component unmounts
+      const errorCallback = (errorMessage: string) => {
+        if (callbacksRef.current.onScanFailure) {
+          callbacksRef.current.onScanFailure(errorMessage);
+        }
+      };
+
+      scanner.render(successCallback, errorCallback);
+      scannerRef.current = scanner;
+    }
+
     return () => {
-      scanner.clear().catch(error => {
-        console.error("Failed to clear html5-qrcode-scanner.", error);
-      });
+      const scanner = scannerRef.current;
+      if (scanner) {
+        if (scanner.getState() === Html5QrcodeScannerState.SCANNING) {
+          scanner.clear().catch(error => {
+            console.error("Failed to clear html5-qrcode-scanner.", error);
+          });
+        }
+        scannerRef.current = null;
+      }
     };
-  }, [onScanSuccess, onScanFailure]);
+  }, []);
 
   return <div id="reader" className="w-full" />;
 };
