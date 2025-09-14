@@ -20,29 +20,46 @@ const isPlasticBottle = (product: {
   packaging?: string;
   packaging_en?: string;
   packagings?: { material?: string; shape?: string }[];
+  product_name?: string;
+  generic_name?: string;
+  categories_tags?: string[];
 }): boolean => {
   if (!product) return false;
 
   const normalize = (str: string) => str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-  const allPackagingStrings = [
+  // Gather all relevant text fields into one array
+  const allTextSources = [
     product.packaging || '',
     product.packaging_en || '',
+    product.product_name || '',
+    product.generic_name || '',
     ...(product.packaging_tags || []),
+    ...(product.categories_tags || []),
     ...(product.packagings?.map(p => `${p.material || ''} ${p.shape || ''}`) || [])
   ].map(normalize);
 
-  const bottleKeywords = ['bottle', 'bouteille', 'botella'];
+  const combinedString = allTextSources.join(' ');
+
+  const bottleKeywords = ['bottle', 'bouteille', 'botella', 'beverage', 'water', 'soda', 'juice', 'drink'];
   const plasticKeywords = ['plastic', 'plastique', 'plastico', 'pet', 'hdpe'];
   const glassKeywords = ['glass', 'verre', 'vidrio'];
 
-  const combinedString = allPackagingStrings.join(' ');
-
-  const isBottle = bottleKeywords.some(kw => combinedString.includes(kw));
-  const isPlastic = plasticKeywords.some(kw => combinedString.includes(kw));
+  const isLikelyBottle = bottleKeywords.some(kw => combinedString.includes(kw));
+  const isLikelyPlastic = plasticKeywords.some(kw => combinedString.includes(kw));
   const isNotGlass = !glassKeywords.some(kw => combinedString.includes(kw));
 
-  return isBottle && isPlastic && isNotGlass;
+  // If packaging is explicitly mentioned, it's a strong signal.
+  if (isLikelyPlastic && isLikelyBottle) {
+    return isNotGlass;
+  }
+  
+  // Fallback for when 'plastic' isn't mentioned but it's a beverage not in glass.
+  if (isLikelyBottle && isNotGlass) {
+    return true;
+  }
+
+  return false;
 };
 
 
