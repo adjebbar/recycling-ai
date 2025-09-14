@@ -33,12 +33,12 @@ interface FeatureCardProps {
 }
 
 const FeatureCard = ({ icon: Icon, title, description, delay }: FeatureCardProps) => (
-    <Card className="text-center bg-white/60 backdrop-blur-sm border border-green-100 shadow-lg animate-fade-in-up rounded-xl" style={{ animationDelay: delay }}>
+    <Card className="text-center bg-card border shadow-lg animate-fade-in-up rounded-xl" style={{ animationDelay: delay }}>
         <CardContent className="p-8">
             <div className="mx-auto bg-primary/10 rounded-full p-4 w-fit mb-4">
                 <Icon className="h-8 w-8 text-primary" />
             </div>
-            <h3 className="text-xl font-semibold mb-2 text-gray-900">{title}</h3>
+            <h3 className="text-xl font-semibold mb-2 text-card-foreground">{title}</h3>
             <p className="text-muted-foreground">{description}</p>
         </CardContent>
     </Card>
@@ -70,7 +70,7 @@ const LandingPage = () => {
         </section>
 
         {/* Features Section */}
-        <section className="py-16 md:py-24 bg-white/70 backdrop-blur-md">
+        <section className="py-16 md:py-24 bg-background">
             <div className="container mx-auto px-4">
                 <div className="text-center mb-12">
                     <h2 className="text-3xl md:text-4xl font-bold">How It Works</h2>
