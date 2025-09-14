@@ -91,45 +91,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const addPoints = async (amount: number, barcode?: string) => {
     if (!user) return;
 
-    // Optimistically update points
-    const newPoints = points + amount;
-    setPoints(newPoints);
+    const originalPoints = points;
+    setPoints(prevPoints => prevPoints + amount);
 
-    // Update profile points
     const { error: profileError } = await supabase
       .from('profiles')
-      .update({ points: newPoints })
+      .update({ points: originalPoints + amount })
       .eq('id', user.id);
 
     if (profileError) {
-      setPoints(points); // Revert optimistic update
+      setPoints(originalPoints);
       showError("Failed to update your points.");
       console.error(profileError);
       return;
     }
 
-    // Log the scan in the history table
     const { error: historyError } = await supabase
       .from('scan_history')
       .insert({ user_id: user.id, points_earned: amount, product_barcode: barcode });
 
     if (historyError) {
       console.error("Failed to log scan history:", historyError);
-      // Not showing an error to the user as the main action (points) succeeded.
     }
 
-    // Optimistically update community stats
-    const newTotalBottles = totalBottlesRecycled + 1;
-    setTotalBottlesRecycled(newTotalBottles);
+    const originalTotalBottles = totalBottlesRecycled;
+    setTotalBottlesRecycled(prevTotal => prevTotal + 1);
 
-    // Update community stats
     const { error: statsError } = await supabase
-      .from('community_stats')
-      .update({ total_bottles_recycled: newTotalBottles })
-      .eq('id', 1);
+      .rpc('increment_total_bottles');
     
     if (statsError) {
-      setTotalBottlesRecycled(totalBottlesRecycled); // Revert
+      setTotalBottlesRecycled(originalTotalBottles);
       showError("Failed to update community stats.");
       console.error(statsError);
     }
