@@ -21,6 +21,7 @@ import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 import { DailyBonus } from "./components/DailyBonus";
 import { ConfettiProvider } from "./components/ConfettiProvider";
+import SettingsPage from "./pages/Settings";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +55,7 @@ const AppContent = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/settings" element={<SettingsPage />} />
           
           <Route element={<AdminRoute />}>
             <Route path="/admin" element={<AdminPage />} />
