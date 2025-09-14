@@ -28,6 +28,11 @@ export const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // Hide the main app navbar on the landing page for logged-out users
+  if (!user && location.pathname === '/') {
+    return null;
+  }
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     showSuccess("You have been logged out.");
