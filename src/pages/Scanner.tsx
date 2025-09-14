@@ -9,6 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import BarcodeScanner from '@/components/BarcodeScanner';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const POINTS_PER_BOTTLE = 10;
 
@@ -39,9 +41,10 @@ const isPlasticBottle = (packagings: Packaging[]): boolean => {
 
 
 const ScannerPage = () => {
-  const { addPoints } = useAuth();
+  const { addPoints, user } = useAuth();
   const [lastScanned, setLastScanned] = useState<string | null>(null);
   const [manualBarcode, setManualBarcode] = useState('');
+  const navigate = useNavigate();
 
   const processBarcode = async (barcode: string) => {
     if (!barcode || barcode === lastScanned) {
@@ -62,6 +65,19 @@ const ScannerPage = () => {
         if (isPlasticBottle(packagings)) {
           await addPoints(POINTS_PER_BOTTLE, barcode);
           showSuccess(`Bouteille en plastique détectée ! +${POINTS_PER_BOTTLE} points.`);
+          
+          if (!user) {
+            setTimeout(() => {
+              toast.info("Voulez-vous sauvegarder votre progression ?", {
+                description: "Inscrivez-vous pour suivre votre score et obtenir des récompenses.",
+                action: {
+                  label: "S'inscrire",
+                  onClick: () => navigate('/signup'),
+                },
+                duration: 5000,
+              });
+            }, 1500);
+          }
         } else {
           showError("Cet article n'est pas une bouteille en plastique reconnue.");
         }
