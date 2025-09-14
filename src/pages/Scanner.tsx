@@ -18,41 +18,29 @@ const POINTS_PER_BOTTLE = 10;
 const isPlasticBottle = (product: {
   packaging_tags?: string[];
   packaging?: string;
+  packaging_en?: string;
   packagings?: { material?: string; shape?: string }[];
 }): boolean => {
   if (!product) return false;
 
-  const tags = product.packaging_tags?.map(t => t.toLowerCase()) || [];
-  const packagingString = (product.packaging || '').toLowerCase();
-  const packagingsArray = product.packagings || [];
+  const normalize = (str: string) => str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+  const allPackagingStrings = [
+    product.packaging || '',
+    product.packaging_en || '',
+    ...(product.packaging_tags || []),
+    ...(product.packagings?.map(p => `${p.material || ''} ${p.shape || ''}`) || [])
+  ].map(normalize);
 
   const bottleKeywords = ['bottle', 'bouteille', 'botella'];
-  const plasticKeywords = ['plastic', 'plastique', 'plástico', 'pet', 'hdpe'];
+  const plasticKeywords = ['plastic', 'plastique', 'plastico', 'pet', 'hdpe'];
   const glassKeywords = ['glass', 'verre', 'vidrio'];
 
-  const isBottle = 
-    tags.some(tag => bottleKeywords.some(kw => tag.includes(kw))) ||
-    bottleKeywords.some(kw => packagingString.includes(kw)) ||
-    packagingsArray.some(p => {
-      const shape = (p.shape || '').toLowerCase();
-      return bottleKeywords.some(kw => shape.includes(kw));
-    });
+  const combinedString = allPackagingStrings.join(' ');
 
-  const isPlastic = 
-    tags.some(tag => plasticKeywords.some(kw => tag.includes(kw))) ||
-    plasticKeywords.some(kw => packagingString.includes(kw)) ||
-    packagingsArray.some(p => {
-      const material = (p.material || '').toLowerCase();
-      return plasticKeywords.some(kw => material.includes(kw));
-    });
-
-  const isNotGlass = 
-    !tags.some(tag => glassKeywords.some(kw => tag.includes(kw))) &&
-    !glassKeywords.some(kw => packagingString.includes(kw)) &&
-    !packagingsArray.some(p => {
-      const material = (p.material || '').toLowerCase();
-      return glassKeywords.some(kw => material.includes(kw));
-    });
+  const isBottle = bottleKeywords.some(kw => combinedString.includes(kw));
+  const isPlastic = plasticKeywords.some(kw => combinedString.includes(kw));
+  const isNotGlass = !glassKeywords.some(kw => combinedString.includes(kw));
 
   return isBottle && isPlastic && isNotGlass;
 };
