@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { showError, showSuccess, showLoading, dismissToast } from '@/utils/toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Camera, CameraOff, Keyboard } from 'lucide-react';
+import { Camera, CameraOff, Keyboard, CheckCircle2, XCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -12,6 +12,7 @@ import BarcodeScanner from '@/components/BarcodeScanner';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { cn } from '@/lib/utils';
 
 const POINTS_PER_BOTTLE = 10;
 
@@ -69,6 +70,7 @@ const ScannerPage = () => {
   const [lastScanned, setLastScanned] = useState<string | null>(null);
   const [manualBarcode, setManualBarcode] = useState('');
   const navigate = useNavigate();
+  const [scanResult, setScanResult] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const processBarcode = async (barcode: string) => {
     if (!barcode || barcode === lastScanned) {
@@ -87,7 +89,9 @@ const ScannerPage = () => {
       if (data.status === 1 && data.product) {
         if (isPlasticBottle(data.product)) {
           await addPoints(POINTS_PER_BOTTLE, barcode);
-          showSuccess(t('scanner.success', { points: POINTS_PER_BOTTLE }));
+          const successMessage = t('scanner.success', { points: POINTS_PER_BOTTLE });
+          showSuccess(successMessage);
+          setScanResult({ type: 'success', message: successMessage });
           
           if (!user) {
             const hasShownToast = sessionStorage.getItem('signupToastShown');
@@ -106,17 +110,26 @@ const ScannerPage = () => {
             }
           }
         } else {
-          showError(t('scanner.notPlastic'));
+          const errorMessage = t('scanner.notPlastic');
+          showError(errorMessage);
+          setScanResult({ type: 'error', message: errorMessage });
         }
       } else {
-        showError(t('scanner.notFound'));
+        const errorMessage = t('scanner.notFound');
+        showError(errorMessage);
+        setScanResult({ type: 'error', message: errorMessage });
       }
     } catch (err) {
       dismissToast(loadingToast);
-      showError(t('scanner.connectionError'));
+      const errorMessage = t('scanner.connectionError');
+      showError(errorMessage);
+      setScanResult({ type: 'error', message: errorMessage });
       console.error(err);
     } finally {
-      setTimeout(() => setLastScanned(null), 3000);
+      setTimeout(() => {
+        setLastScanned(null);
+        setScanResult(null);
+      }, 3000);
     }
   };
 
@@ -146,8 +159,28 @@ const ScannerPage = () => {
         </TabsList>
         <TabsContent value="camera">
           <Card className="overflow-hidden bg-card/70 backdrop-blur-lg border">
-            <CardContent className="p-4">
+            <CardContent className="p-4 relative">
               <BarcodeScanner onScanSuccess={processBarcode} />
+              {scanResult && (
+                <div
+                  className="absolute inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center text-center p-4 animate-fade-in-up"
+                  style={{ animationDuration: '0.3s' }}
+                >
+                  {scanResult.type === 'success' ? (
+                    <CheckCircle2 className="w-16 h-16 text-green-500 mb-4" />
+                  ) : (
+                    <XCircle className="w-16 h-16 text-destructive mb-4" />
+                  )}
+                  <p
+                    className={cn(
+                      'text-xl font-semibold',
+                      scanResult.type === 'success' ? 'text-green-500' : 'text-destructive'
+                    )}
+                  >
+                    {scanResult.message}
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
