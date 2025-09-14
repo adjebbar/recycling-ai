@@ -26,9 +26,9 @@ const isPlasticBottle = (product: {
   const packagingString = (product.packaging || '').toLowerCase();
   const packagingsArray = product.packagings || [];
 
-  const bottleKeywords = ['bottle', 'bouteille'];
-  const plasticKeywords = ['plastic', 'plastique', 'pet', 'hdpe'];
-  const glassKeywords = ['glass', 'verre'];
+  const bottleKeywords = ['bottle', 'bouteille', 'botella'];
+  const plasticKeywords = ['plastic', 'plastique', 'plástico', 'pet', 'hdpe'];
+  const glassKeywords = ['glass', 'verre', 'vidrio'];
 
   const isBottle = 
     tags.some(tag => bottleKeywords.some(kw => tag.includes(kw))) ||
