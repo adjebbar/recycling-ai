@@ -30,7 +30,7 @@ const SignUpPage = () => {
 
   return (
     <div className="container mx-auto p-4 flex justify-center items-center min-h-[calc(100vh-4rem)]">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md bg-card/60 backdrop-blur-md">
         <CardHeader>
           <CardTitle>Sign Up</CardTitle>
           <CardDescription>Create a new account to start recycling.</CardDescription>

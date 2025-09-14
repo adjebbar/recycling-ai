@@ -30,7 +30,7 @@ const LoginPage = () => {
 
   return (
     <div className="container mx-auto p-4 flex justify-center items-center min-h-[calc(100vh-4rem)]">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md bg-card/60 backdrop-blur-md">
         <CardHeader>
           <CardTitle>Login</CardTitle>
           <CardDescription>Enter your credentials to access your account.</CardDescription>
