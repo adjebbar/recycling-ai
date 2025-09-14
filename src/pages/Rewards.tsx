@@ -24,7 +24,7 @@ const RewardsPage = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 animate-fade-in-up">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold mb-2">Redeem Rewards</h1>
         <p className="text-lg text-muted-foreground">

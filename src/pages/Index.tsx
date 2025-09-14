@@ -30,7 +30,7 @@ const Index = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <section className="py-12">
+      <section className="py-12 animate-fade-in-up">
         <div className="grid md:grid-cols-2 gap-8 items-center">
           <div className="text-center md:text-left">
             <Recycle className="mx-auto md:mx-0 h-16 w-16 text-primary mb-4" />
@@ -79,10 +79,18 @@ const Index = () => {
         </div>
       </section>
 
-      {!user && <GettingStarted />}
-      <CommunityImpact />
-      <RecyclingBenefits />
-      <RewardsCarousel />
+      <div className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+        {!user && <GettingStarted />}
+      </div>
+      <div className="animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+        <CommunityImpact />
+      </div>
+      <div className="animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+        <RecyclingBenefits />
+      </div>
+      <div className="animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
+        <RewardsCarousel />
+      </div>
     </div>
   );
 };
