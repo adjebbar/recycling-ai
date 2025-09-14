@@ -2,14 +2,14 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { useUser } from "@/context/UserContext";
+import { useAuth } from "@/context/AuthContext";
 import { showError, showSuccess } from "@/utils/toast";
 import { rewards } from "@/data/rewards";
 import { useAnimatedCounter } from "@/hooks/useAnimatedCounter";
 import { Gift } from "lucide-react";
 
 const RewardsPage = () => {
-  const { points, spendPoints } = useUser();
+  const { points, spendPoints } = useAuth();
   const animatedPoints = useAnimatedCounter(points);
 
   const handleRedeem = (cost: number, name: string) => {

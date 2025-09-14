@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { QrReader } from 'react-qr-reader';
-import { useUser } from '@/context/UserContext';
+import { useAuth } from '@/context/AuthContext';
 import { showError, showSuccess, showLoading, dismissToast } from '@/utils/toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Camera, CameraOff, Keyboard } from 'lucide-react';
@@ -39,7 +39,7 @@ const isPlasticBottle = (packagings: Packaging[]): boolean => {
 
 
 const ScannerPage = () => {
-  const { addPoints } = useUser();
+  const { addPoints } = useAuth();
   const [lastScanned, setLastScanned] = useState<string | null>(null);
   const [manualBarcode, setManualBarcode] = useState('');
 

@@ -2,11 +2,11 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAnimatedCounter } from "@/hooks/useAnimatedCounter";
-import { useUser } from "@/context/UserContext";
+import { useAuth } from "@/context/AuthContext";
 import { Users, Recycle } from "lucide-react";
 
 const CommunityImpact = () => {
-  const { totalBottlesRecycled, activeRecyclers } = useUser();
+  const { totalBottlesRecycled, activeRecyclers } = useAuth();
   
   const animatedBottles = useAnimatedCounter(totalBottlesRecycled, 1000);
   const animatedRecyclers = useAnimatedCounter(activeRecyclers, 1000);

@@ -1,17 +1,27 @@
 "use client";
 
-import { Link, useLocation } from 'react-router-dom';
-import { Recycle, ScanLine, Trophy } from 'lucide-react';
-import { useUser } from '@/context/UserContext';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Recycle, ScanLine, Trophy, LogOut } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 import { ThemeToggle } from './theme-toggle';
 import { useAnimatedCounter } from '@/hooks/useAnimatedCounter';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { Button } from './ui/button';
+import { supabase } from '@/lib/supabaseClient';
+import { showSuccess } from '@/utils/toast';
 
 export const Navbar = () => {
-  const { points } = useUser();
+  const { user, points } = useAuth();
   const animatedPoints = useAnimatedCounter(points);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    showSuccess("You have been logged out.");
+    navigate('/');
+  };
 
   const navLinks = [
     { href: '/scanner', label: 'Scan', icon: ScanLine },
@@ -47,9 +57,26 @@ export const Navbar = () => {
           })}
         </nav>
         <div className="flex items-center justify-end space-x-4">
-          <Badge variant="secondary" className="text-base font-semibold">
-            {animatedPoints} Points
-          </Badge>
+          {user ? (
+            <>
+              <Badge variant="secondary" className="text-base font-semibold">
+                {animatedPoints} Points
+              </Badge>
+              <Button variant="ghost" size="icon" onClick={handleLogout}>
+                <LogOut className="h-5 w-5" />
+                <span className="sr-only">Logout</span>
+              </Button>
+            </>
+          ) : (
+            <div className="space-x-2">
+              <Button asChild variant="ghost">
+                <Link to="/login">Login</Link>
+              </Button>
+              <Button asChild>
+                <Link to="/signup">Sign Up</Link>
+              </Button>
+            </div>
+          )}
           <ThemeToggle />
         </div>
       </div>
