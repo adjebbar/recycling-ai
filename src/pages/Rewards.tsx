@@ -12,9 +12,9 @@ const RewardsPage = () => {
   const { points, spendPoints } = useAuth();
   const animatedPoints = useAnimatedCounter(points);
 
-  const handleRedeem = (cost: number, name: string) => {
+  const handleRedeem = async (cost: number, name: string) => {
     if (points >= cost) {
-      spendPoints(cost);
+      await spendPoints(cost);
       showSuccess(`"${name}" redeemed successfully!`);
     } else {
       showError("Not enough points to redeem this reward.");

@@ -1,8 +1,9 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabaseClient';
+import { showError } from '@/utils/toast';
 
 interface AuthContextType {
   session: Session | null;
@@ -10,9 +11,9 @@ interface AuthContextType {
   points: number;
   totalBottlesRecycled: number;
   activeRecyclers: number;
-  addPoints: (amount: number) => void;
-  spendPoints: (amount: number) => void;
-  resetCommunityStats: () => void;
+  addPoints: (amount: number) => Promise<void>;
+  spendPoints: (amount: number) => Promise<void>;
+  resetCommunityStats: () => Promise<void>;
   loading: boolean;
 }
 
@@ -23,22 +24,58 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // NOTE: The following stats are currently local.
-  // For a production app, these should be stored and managed in your Supabase database.
   const [points, setPoints] = useState(0);
-  const [totalBottlesRecycled, setTotalBottlesRecycled] = useState(125432);
-  const [activeRecyclers, setActiveRecyclers] = useState(876);
-  const [hasScanned, setHasScanned] = useState(false);
+  const [totalBottlesRecycled, setTotalBottlesRecycled] = useState(0);
+  const [activeRecyclers, setActiveRecyclers] = useState(0);
+
+  const fetchCommunityStats = useCallback(async () => {
+    const { data, error } = await supabase
+      .from('community_stats')
+      .select('total_bottles_recycled, active_recyclers')
+      .eq('id', 1)
+      .single();
+
+    if (error) {
+      console.error('Error fetching community stats:', error);
+      showError("Could not load community stats.");
+    } else if (data) {
+      setTotalBottlesRecycled(data.total_bottles_recycled);
+      setActiveRecyclers(data.active_recyclers);
+    }
+  }, []);
 
   useEffect(() => {
-    const getSession = async () => {
+    if (user) {
+      const fetchProfile = async () => {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('points')
+          .eq('id', user.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching user profile:', error);
+        } else if (data) {
+          setPoints(data.points);
+        }
+      };
+      fetchProfile();
+    } else {
+      setPoints(0);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    const getSessionAndStats = async () => {
+      setLoading(true);
       const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
       setUser(session?.user ?? null);
+      await fetchCommunityStats();
       setLoading(false);
     };
 
-    getSession();
+    getSessionAndStats();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
@@ -48,28 +85,76 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [fetchCommunityStats]);
 
-  const addPoints = (amount: number) => {
-    if (!user) return; // Only add points for logged-in users
-    setPoints((prevPoints) => prevPoints + amount);
-    setTotalBottlesRecycled((prevTotal) => prevTotal + 1);
-    if (!hasScanned) {
-      setActiveRecyclers((prevRecyclers) => prevRecyclers + 1);
-      setHasScanned(true);
+  const addPoints = async (amount: number) => {
+    if (!user) return;
+
+    const newPoints = points + amount;
+    setPoints(newPoints);
+
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .update({ points: newPoints })
+      .eq('id', user.id);
+
+    if (profileError) {
+      setPoints(points);
+      showError("Failed to update your points.");
+      console.error(profileError);
+      return;
+    }
+
+    const newTotalBottles = totalBottlesRecycled + 1;
+    setTotalBottlesRecycled(newTotalBottles);
+
+    const { error: statsError } = await supabase
+      .from('community_stats')
+      .update({ total_bottles_recycled: newTotalBottles })
+      .eq('id', 1);
+    
+    if (statsError) {
+      setTotalBottlesRecycled(totalBottlesRecycled);
+      showError("Failed to update community stats.");
+      console.error(statsError);
     }
   };
 
-  const spendPoints = (amount: number) => {
-    if (!user) return;
-    setPoints((prevPoints) => Math.max(0, prevPoints - amount));
+  const spendPoints = async (amount: number) => {
+    if (!user || points < amount) return;
+
+    const newPoints = points - amount;
+    setPoints(newPoints);
+
+    const { error } = await supabase
+      .from('profiles')
+      .update({ points: newPoints })
+      .eq('id', user.id);
+
+    if (error) {
+      setPoints(points);
+      showError("Failed to redeem reward.");
+      console.error(error);
+    }
   };
 
-  const resetCommunityStats = () => {
-    setTotalBottlesRecycled(0);
-    setActiveRecyclers(0);
-    setPoints(0);
-    setHasScanned(false);
+  const resetCommunityStats = async () => {
+    const newTotalBottles = 0;
+    const newActiveRecyclers = 0;
+
+    setTotalBottlesRecycled(newTotalBottles);
+    setActiveRecyclers(newActiveRecyclers);
+
+    const { error } = await supabase
+      .from('community_stats')
+      .update({ total_bottles_recycled: newTotalBottles, active_recyclers: newActiveRecyclers })
+      .eq('id', 1);
+
+    if (error) {
+      showError("Failed to reset community stats.");
+      console.error(error);
+      fetchCommunityStats();
+    }
   };
 
   const value = {

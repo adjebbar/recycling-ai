@@ -62,7 +62,7 @@ const ScannerPage = () => {
       if (data.status === 1 && data.product) {
         const packagings = data.product.packagings || [];
         if (isPlasticBottle(packagings)) {
-          addPoints(POINTS_PER_BOTTLE);
+          await addPoints(POINTS_PER_BOTTLE);
           showSuccess(`Bouteille en plastique détectée ! +${POINTS_PER_BOTTLE} points.`);
         } else {
           showError("Cet article n'est pas une bouteille en plastique reconnue.");

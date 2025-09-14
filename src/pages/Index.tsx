@@ -11,6 +11,7 @@ import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import CommunityImpact from "@/components/CommunityImpact";
 import RecyclingBenefits from "@/components/RecyclingBenefits";
+import { showSuccess } from "@/utils/toast";
 
 const Index = () => {
   const { points, resetCommunityStats, user } = useAuth();
@@ -21,6 +22,11 @@ const Index = () => {
   }, [points]);
 
   const progress = nextReward ? (points / nextReward.cost) * 100 : 100;
+
+  const handleReset = async () => {
+    await resetCommunityStats();
+    showSuccess("Community stats have been reset.");
+  };
 
   return (
     <div className="container mx-auto p-4">
@@ -83,7 +89,7 @@ const Index = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="destructive" onClick={resetCommunityStats}>
+              <Button variant="destructive" onClick={handleReset}>
                 Reset All Stats
               </Button>
             </CardContent>
