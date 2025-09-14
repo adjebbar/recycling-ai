@@ -99,7 +99,7 @@ const RewardsManager = () => {
   };
 
   return (
-    <Card className="max-w-4xl mx-auto mt-8 bg-card/80 backdrop-blur-sm">
+    <Card className="max-w-4xl mx-auto mt-8 bg-card/60 backdrop-blur-md">
       <CardHeader>
         <div className="flex justify-between items-center">
           <div>

@@ -33,7 +33,7 @@ const Index = () => {
       <section className="py-12">
         <div className="grid md:grid-cols-2 gap-8 items-center">
           <div className="text-center md:text-left">
-            <Recycle className="mx-auto md:mx-0 h-16 w-16 text-primary/80 mb-4" />
+            <Recycle className="mx-auto md:mx-0 h-16 w-16 text-primary mb-4" />
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
               {user ? t('home.welcomeBack') : t('home.joinRevolution')}
             </h1>
@@ -50,7 +50,7 @@ const Index = () => {
           
           {points > 0 && (
             <div className="space-y-6">
-              <Card className="w-full bg-card/80 backdrop-blur-sm">
+              <Card className="w-full bg-card/60 backdrop-blur-md">
                 <CardHeader>
                   <CardTitle>{user ? t('home.yourPoints') : t('home.yourUnsavedPoints')}</CardTitle>
                   {!user && <CardDescription>{t('home.saveProgress')}</CardDescription>}
@@ -61,7 +61,7 @@ const Index = () => {
               </Card>
 
               {user && nextReward && (
-                <Card className="w-full bg-card/80 backdrop-blur-sm">
+                <Card className="w-full bg-card/60 backdrop-blur-md">
                   <CardHeader>
                     <CardTitle>{t('home.nextReward')}</CardTitle>
                   </CardHeader>

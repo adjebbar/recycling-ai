@@ -34,7 +34,7 @@ const RewardsPage = () => {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {isLoading ? (
           Array.from({ length: 3 }).map((_, i) => (
-            <Card key={i} className="flex flex-col bg-card/80 backdrop-blur-sm">
+            <Card key={i} className="flex flex-col bg-card/60 backdrop-blur-md">
               <CardHeader className="flex-row gap-4 items-center">
                 <Skeleton className="w-10 h-10 rounded-full" />
                 <div>
@@ -55,7 +55,7 @@ const RewardsPage = () => {
             const Icon = getIcon(reward.icon);
             const canRedeem = points >= reward.cost;
             return (
-              <Card key={reward.id} className="flex flex-col bg-card/80 backdrop-blur-sm">
+              <Card key={reward.id} className="flex flex-col bg-card/60 backdrop-blur-md">
                 <CardHeader className="flex-row gap-4 items-center">
                   <Icon className="w-10 h-10 text-primary" />
                   <div>

@@ -57,7 +57,7 @@ const RewardsCarousel = () => {
               <CarouselItem key={reward.id} className="md:basis-1/2 lg:basis-1/3">
                 <div className="p-1">
                   <Link to="/rewards">
-                    <Card className="bg-card/80 backdrop-blur-sm h-full flex flex-col items-center justify-center text-center p-6 hover:bg-accent/50 transition-colors">
+                    <Card className="bg-card/60 backdrop-blur-md h-full flex flex-col items-center justify-center text-center p-6 hover:bg-accent/50 transition-colors">
                       <Icon className="w-12 h-12 text-primary mb-4" />
                       <CardHeader className="p-0">
                         <CardTitle>{reward.name}</CardTitle>

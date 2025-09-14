@@ -27,7 +27,7 @@ const ProfilePage = () => {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 max-w-2xl mx-auto mb-8">
-        <Card className="bg-card/80 backdrop-blur-sm">
+        <Card className="bg-card/60 backdrop-blur-md">
           <CardHeader>
             <CardTitle>{t('profile.totalPoints')}</CardTitle>
           </CardHeader>
@@ -35,7 +35,7 @@ const ProfilePage = () => {
             <p className="text-4xl font-bold text-primary">{animatedPoints.toLocaleString()}</p>
           </CardContent>
         </Card>
-        <Card className="bg-card/80 backdrop-blur-sm">
+        <Card className="bg-card/60 backdrop-blur-md">
           <CardHeader>
             <CardTitle>{t('profile.bottlesRecycled')}</CardTitle>
           </CardHeader>
@@ -45,9 +45,9 @@ const ProfilePage = () => {
         </Card>
       </div>
 
-      <Achievements points={points} totalScans={totalScans} />
+      <Achievements />
 
-      <Card className="max-w-4xl mx-auto mt-8 bg-card/80 backdrop-blur-sm">
+      <Card className="max-w-4xl mx-auto mt-8 bg-card/60 backdrop-blur-md">
         <CardHeader>
           <CardTitle>{t('profile.recentActivity')}</CardTitle>
           <CardDescription>{t('profile.recentActivityDescription')}</CardDescription>

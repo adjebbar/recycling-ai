@@ -33,7 +33,7 @@ const LeaderboardPage = () => {
           See who is leading the charge in our community!
         </p>
       </div>
-      <Card className="max-w-2xl mx-auto bg-card/80 backdrop-blur-sm">
+      <Card className="max-w-2xl mx-auto bg-card/60 backdrop-blur-md">
         <CardHeader>
           <CardTitle>Leaderboard</CardTitle>
           <CardDescription>Top 10 users by points</CardDescription>

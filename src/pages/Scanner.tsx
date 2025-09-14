@@ -121,14 +121,14 @@ const ScannerPage = () => {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="camera">
-          <Card className="overflow-hidden bg-card/80 backdrop-blur-sm">
+          <Card className="overflow-hidden bg-card/60 backdrop-blur-md">
             <CardContent className="p-4">
               <BarcodeScanner onScanSuccess={processBarcode} />
             </CardContent>
           </Card>
         </TabsContent>
         <TabsContent value="manual">
-          <Card className="bg-card/80 backdrop-blur-sm">
+          <Card className="bg-card/60 backdrop-blur-md">
             <CardHeader>
               <CardTitle>{t('scanner.manualTitle')}</CardTitle>
               <CardDescription>{t('scanner.manualDescription')}</CardDescription>

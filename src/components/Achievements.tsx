@@ -5,14 +5,14 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { achievementsList } from "@/lib/achievements";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "@/context/AuthContext";
+import { useProfileData } from "@/hooks/useProfileData";
 
-interface AchievementsProps {
-  points: number;
-  totalScans: number;
-}
-
-const Achievements = ({ points, totalScans }: AchievementsProps) => {
+const Achievements = () => {
   const { t } = useTranslation();
+  const { points } = useAuth();
+  const { data: scanHistory } = useProfileData();
+  const totalScans = scanHistory?.length ?? 0;
   const userStats = { points, totalScans };
 
   const toCamelCase = (str: string) => {
@@ -20,7 +20,7 @@ const Achievements = ({ points, totalScans }: AchievementsProps) => {
   };
 
   return (
-    <Card className="max-w-4xl mx-auto bg-card/80 backdrop-blur-sm">
+    <Card className="max-w-4xl mx-auto bg-card/60 backdrop-blur-md">
       <CardHeader>
         <CardTitle>{t('profile.achievements')}</CardTitle>
       </CardHeader>
