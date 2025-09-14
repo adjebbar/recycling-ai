@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { AlertTriangle } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
 import { supabase } from '@/lib/supabaseClient';
+import RewardsManager from '@/components/RewardsManager';
 
 const AdminPage = () => {
   const { 
@@ -57,7 +58,7 @@ const AdminPage = () => {
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
       
-      <Card className="max-w-2xl mx-auto bg-card/80 backdrop-blur-sm">
+      <Card className="max-w-4xl mx-auto bg-card/80 backdrop-blur-sm">
         <CardHeader>
           <CardTitle>Community Stats Management</CardTitle>
           <CardDescription>
@@ -91,7 +92,9 @@ const AdminPage = () => {
         </CardContent>
       </Card>
 
-      <Card className="max-w-2xl mx-auto mt-8 bg-card/80 backdrop-blur-sm border-destructive">
+      <RewardsManager />
+
+      <Card className="max-w-4xl mx-auto mt-8 bg-card/80 backdrop-blur-sm border-destructive">
         <CardHeader>
           <CardTitle className="flex items-center">
             <AlertTriangle className="mr-2 h-5 w-5 text-destructive" />

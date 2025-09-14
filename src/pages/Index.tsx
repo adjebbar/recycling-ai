@@ -4,21 +4,22 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/context/AuthContext";
-import { rewards } from "@/data/rewards";
 import { useAnimatedCounter } from "@/hooks/useAnimatedCounter";
 import { Recycle, ScanLine } from "lucide-react";
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import CommunityImpact from "@/components/CommunityImpact";
 import RecyclingBenefits from "@/components/RecyclingBenefits";
+import { useRewards } from "@/hooks/useRewards";
 
 const Index = () => {
   const { points } = useAuth();
+  const { rewards } = useRewards();
   const animatedPoints = useAnimatedCounter(points);
 
   const nextReward = useMemo(() => {
     return rewards.find(reward => points < reward.cost);
-  }, [points]);
+  }, [points, rewards]);
 
   const progress = nextReward ? (points / nextReward.cost) * 100 : 100;
 
