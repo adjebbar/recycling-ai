@@ -74,11 +74,11 @@ const App = () => {
           <Toaster />
           <Sonner position="top-center" />
           <BrowserRouter>
-            <AuthProvider>
-              <ConfettiProvider>
+            <ConfettiProvider>
+              <AuthProvider>
                 <AppContent />
-              </ConfettiProvider>
-            </AuthProvider>
+              </AuthProvider>
+            </ConfettiProvider>
           </BrowserRouter>
         </ThemeProvider>
       </TooltipProvider>
