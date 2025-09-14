@@ -38,8 +38,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       .single();
 
     if (error) {
-      console.error('Error fetching community stats:', error);
-      showError("Could not load community stats.");
+      console.error('Error fetching community stats:', error.message);
+      // Fail silently instead of showing an error to the user
     } else if (data) {
       setTotalBottlesRecycled(data.total_bottles_recycled);
       setActiveRecyclers(data.active_recyclers);
@@ -118,8 +118,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const { error: statsError } = await supabase.rpc('increment_total_bottles');
     if (statsError) {
       setTotalBottlesRecycled(originalTotalBottles);
-      showError("Failed to update community stats.");
-      return;
+      console.error("Failed to update community stats:", statsError.message);
+      // Fail silently
     }
 
     if (user) {
