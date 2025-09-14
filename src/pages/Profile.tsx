@@ -10,6 +10,7 @@ import { useAnimatedCounter } from "@/hooks/useAnimatedCounter";
 import { Badge } from "@/components/ui/badge";
 import Achievements from "@/components/Achievements";
 import { useTranslation } from "react-i18next";
+import ActivityChart from "@/components/ActivityChart";
 
 const ProfilePage = () => {
   const { t } = useTranslation();
@@ -46,6 +47,8 @@ const ProfilePage = () => {
       </div>
 
       <Achievements />
+
+      <ActivityChart scanHistory={scanHistory} />
 
       <Card className="max-w-4xl mx-auto mt-8 bg-card/60 backdrop-blur-md">
         <CardHeader>
