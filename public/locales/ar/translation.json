@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "appName": "تطبيق إعادة التدوير",
+    "scan": "مسح",
+    "rewards": "المكافآت",
+    "leaderboard": "لوحة الصدارة",
+    "points": "{{count}} نقطة",
+    "myAccount": "حسابي",
+    "profile": "الملف الشخصي",
+    "admin": "المسؤول",
+    "logout": "تسجيل الخروج",
+    "login": "تسجيل الدخول",
+    "signup": "إنشاء حساب"
+  },
+  "home": {
+    "welcomeBack": "مرحباً بعودتك!",
+    "joinRevolution": "انضم إلى ثورة إعادة التدوير",
+    "subtitle": "امسح الزجاجات البلاستيكية، واكسب النقاط، واستبدلها بمكافآت مثيرة!",
+    "startScanning": "ابدأ المسح",
+    "yourPoints": "نقاطك",
+    "yourUnsavedPoints": "نقاطك غير المحفوظة",
+    "saveProgress": "سجل الدخول أو أنشئ حسابًا لحفظ تقدمك!",
+    "nextReward": "المكافأة التالية",
+    "pointsProgress": "{{points}}/{{cost}} نقطة",
+    "howItWorks": "كيف يعمل",
+    "communityImpact": "تأثير المجتمع",
+    "whyRecycle": "لماذا نعيد التدوير؟",
+    "featuredRewards": "المكافآت المميزة"
+  },
+  "scanner": {
+    "title": "مسح الباركود",
+    "subtitle": "اختر طريقة لمسح الباركود الخاص بالمنتج.",
+    "cameraTab": "الكاميرا",
+    "manualTab": "يدوي",
+    "manualTitle": "أدخل الباركود",
+    "manualDescription": "أدخل الرقم الموجود أسفل الباركود وانقر على تحقق.",
+    "manualPlaceholder": "أدخل رقم الباركود",
+    "manualButton": "تحقق",
+    "cameraPermission": "إذا لم تظهر الكاميرا، يرجى السماح بالوصول إلى الكاميرا في إعدادات متصفحك.",
+    "verifying": "يتم التحقق من الباركود...",
+    "success": "تم اكتشاف زجاجة بلاستيكية! +{{points}} نقطة.",
+    "notPlastic": "هذا العنصر ليس زجاجة بلاستيكية معترف بها.",
+    "notFound": "المنتج غير موجود في قاعدة البيانات.",
+    "connectionError": "لا يمكن الاتصال بقاعدة بيانات المنتجات.",
+    "signupPromptTitle": "هل تريد حفظ تقدمك؟",
+    "signupPromptDescription": "أنشئ حسابًا لتتبع نتيجتك وكسب المكافآت."
+  },
+  "profile": {
+    "title": "ملفك الشخصي",
+    "totalPoints": "مجموع النقاط",
+    "bottlesRecycled": "الزجاجات المعاد تدويرها",
+    "achievements": "الإنجازات",
+    "recentActivity": "النشاط الأخير",
+    "recentActivityDescription": "إليك آخر 20 عنصرًا قمت بإعادة تدويرها.",
+    "date": "التاريخ",
+    "barcode": "الباركود",
+    "points": "النقاط"
+  },
+  "achievements": {
+    "firstScanName": "الخطوة الأولى",
+    "firstScanDescription": "لقد قمت بمسح أول زجاجة لك!",
+    "noviceRecyclerName": "معيد تدوير مبتدئ",
+    "noviceRecyclerDescription": "لقد قمت بإعادة تدوير 10 زجاجات.",
+    "pointCollectorName": "جامع النقاط",
+    "pointCollectorDescription": "لقد كسبت أكثر من 100 نقطة.",
+    "dedicatedRecyclerName": "معيد تدوير متفانٍ",
+    "dedicatedRecyclerDescription": "لقد قمت بإعادة تدوير 50 زجاجة. استمر!",
+    "pointsHoarderName": "مكتنز النقاط",
+    "pointsHoarderDescription": "لقد جمعت 500 نقطة!"
+  },
+  "rewardsCarousel": {
+    "title": "المكافآت المميزة"
+  }
+}

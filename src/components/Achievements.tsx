@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { achievementsList } from "@/lib/achievements";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface AchievementsProps {
   points: number;
@@ -11,17 +12,25 @@ interface AchievementsProps {
 }
 
 const Achievements = ({ points, totalScans }: AchievementsProps) => {
+  const { t } = useTranslation();
   const userStats = { points, totalScans };
+
+  const toCamelCase = (str: string) => {
+    return str.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+  };
 
   return (
     <Card className="max-w-4xl mx-auto bg-card/80 backdrop-blur-sm">
       <CardHeader>
-        <CardTitle>Succès</CardTitle>
+        <CardTitle>{t('profile.achievements')}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4 text-center">
           {achievementsList.map((achievement) => {
             const isUnlocked = achievement.condition(userStats);
+            const nameKey = `achievements.${toCamelCase(achievement.id)}Name`;
+            const descKey = `achievements.${toCamelCase(achievement.id)}Description`;
+            
             return (
               <TooltipProvider key={achievement.id}>
                 <Tooltip>
@@ -35,13 +44,13 @@ const Achievements = ({ points, totalScans }: AchievementsProps) => {
                       >
                         <achievement.Icon className="w-8 h-8" />
                       </div>
-                      <p className="text-xs font-medium truncate w-full">{achievement.name}</p>
+                      <p className="text-xs font-medium truncate w-full">{t(nameKey)}</p>
                     </div>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p className="font-semibold">{achievement.name}</p>
-                    <p className="text-sm text-muted-foreground">{achievement.description}</p>
-                    {!isUnlocked && <p className="text-xs text-destructive">(Verrouillé)</p>}
+                    <p className="font-semibold">{t(nameKey)}</p>
+                    <p className="text-sm text-muted-foreground">{t(descKey)}</p>
+                    {!isUnlocked && <p className="text-xs text-destructive">(Locked)</p>}
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>

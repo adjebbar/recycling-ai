@@ -11,22 +11,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import BarcodeScanner from '@/components/BarcodeScanner';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 const POINTS_PER_BOTTLE = 10;
 
-// Définir la structure d'un article d'emballage de l'API
 interface Packaging {
   material?: string;
   shape?: string;
 }
 
-// Fonction mise à jour pour vérifier les bouteilles en plastique en fonction des détails de l'emballage
 const isPlasticBottle = (packagings: Packaging[]): boolean => {
   if (!packagings || packagings.length === 0) {
     return false;
   }
 
-  // Vérifier si un article d'emballage est une bouteille faite d'un matériau plastique
   return packagings.some(pkg => {
     const shape = pkg.shape?.toLowerCase() || '';
     const material = pkg.material?.toLowerCase() || '';
@@ -41,6 +39,7 @@ const isPlasticBottle = (packagings: Packaging[]): boolean => {
 
 
 const ScannerPage = () => {
+  const { t } = useTranslation();
   const { addPoints, user } = useAuth();
   const [lastScanned, setLastScanned] = useState<string | null>(null);
   const [manualBarcode, setManualBarcode] = useState('');
@@ -52,7 +51,7 @@ const ScannerPage = () => {
     }
     
     setLastScanned(barcode);
-    const loadingToast = showLoading('Vérification du code-barres...');
+    const loadingToast = showLoading(t('scanner.verifying'));
 
     try {
       const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
@@ -64,33 +63,33 @@ const ScannerPage = () => {
         const packagings = data.product.packagings || [];
         if (isPlasticBottle(packagings)) {
           await addPoints(POINTS_PER_BOTTLE, barcode);
-          showSuccess(`Bouteille en plastique détectée ! +${POINTS_PER_BOTTLE} points.`);
+          showSuccess(t('scanner.success', { points: POINTS_PER_BOTTLE }));
           
           if (!user) {
             const hasShownToast = sessionStorage.getItem('signupToastShown');
             if (!hasShownToast) {
               setTimeout(() => {
-                toast.info("Voulez-vous sauvegarder votre progression ?", {
-                  description: "Inscrivez-vous pour suivre votre score et obtenir des récompenses.",
+                toast.info(t('scanner.signupPromptTitle'), {
+                  description: t('scanner.signupPromptDescription'),
                   action: {
-                    label: "S'inscrire",
+                    label: t('nav.signup'),
                     onClick: () => navigate('/signup'),
                   },
-                  duration: 10000, // Increased duration
+                  duration: 10000,
                 });
                 sessionStorage.setItem('signupToastShown', 'true');
               }, 1500);
             }
           }
         } else {
-          showError("Cet article n'est pas une bouteille en plastique reconnue.");
+          showError(t('scanner.notPlastic'));
         }
       } else {
-        showError('Produit non trouvé dans la base de données.');
+        showError(t('scanner.notFound'));
       }
     } catch (err) {
       dismissToast(loadingToast);
-      showError('Impossible de se connecter à la base de données des produits.');
+      showError(t('scanner.connectionError'));
       console.error(err);
     } finally {
       setTimeout(() => setLastScanned(null), 3000);
@@ -106,19 +105,19 @@ const ScannerPage = () => {
   return (
     <div className="container mx-auto p-4 flex flex-col items-center">
       <div className="text-center max-w-lg w-full">
-        <h1 className="text-3xl font-bold mb-4">Scanner le code-barres</h1>
-        <p className="text-muted-foreground mb-6">Choisissez une méthode pour scanner le code-barres d'un produit.</p>
+        <h1 className="text-3xl font-bold mb-4">{t('scanner.title')}</h1>
+        <p className="text-muted-foreground mb-6">{t('scanner.subtitle')}</p>
       </div>
       
       <Tabs defaultValue="camera" className="w-full max-w-lg">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="camera">
             <Camera className="mr-2 h-4 w-4" />
-            Caméra
+            {t('scanner.cameraTab')}
           </TabsTrigger>
           <TabsTrigger value="manual">
             <Keyboard className="mr-2 h-4 w-4" />
-            Manuel
+            {t('scanner.manualTab')}
           </TabsTrigger>
         </TabsList>
         <TabsContent value="camera">
@@ -131,18 +130,18 @@ const ScannerPage = () => {
         <TabsContent value="manual">
           <Card className="bg-card/80 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle>Entrez le code-barres</CardTitle>
-              <CardDescription>Entrez le numéro sous le code-barres et cliquez sur Vérifier.</CardDescription>
+              <CardTitle>{t('scanner.manualTitle')}</CardTitle>
+              <CardDescription>{t('scanner.manualDescription')}</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleManualSubmit} className="flex space-x-2">
                 <Input
                   type="text"
-                  placeholder="Entrez le numéro du code-barres"
+                  placeholder={t('scanner.manualPlaceholder')}
                   value={manualBarcode}
                   onChange={(e) => setManualBarcode(e.target.value)}
                 />
-                <Button type="submit">Vérifier</Button>
+                <Button type="submit">{t('scanner.manualButton')}</Button>
               </form>
             </CardContent>
           </Card>
@@ -152,7 +151,7 @@ const ScannerPage = () => {
       <div className="text-center mt-6 max-w-lg w-full">
         <p className="text-sm text-muted-foreground flex items-center justify-center">
           <CameraOff className="w-4 h-4 mr-2" />
-          Si la caméra n'apparaît pas, veuillez autoriser l'accès à la caméra dans les paramètres de votre navigateur.
+          {t('scanner.cameraPermission')}
         </p>
       </div>
     </div>

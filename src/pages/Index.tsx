@@ -13,8 +13,10 @@ import RecyclingBenefits from "@/components/RecyclingBenefits";
 import GettingStarted from "@/components/GettingStarted";
 import { useRewards } from "@/hooks/useRewards";
 import RewardsCarousel from "@/components/RewardsCarousel";
+import { useTranslation } from "react-i18next";
 
 const Index = () => {
+  const { t } = useTranslation();
   const { user, points } = useAuth();
   const { rewards } = useRewards();
   const animatedPoints = useAnimatedCounter(points);
@@ -33,15 +35,15 @@ const Index = () => {
           <div className="text-center md:text-left">
             <Recycle className="mx-auto md:mx-0 h-16 w-16 text-primary/80 mb-4" />
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              {user ? `Welcome back!` : "Join the Recycling Revolution"}
+              {user ? t('home.welcomeBack') : t('home.joinRevolution')}
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground mb-8">
-              Scan plastic bottles, earn points, and redeem exciting rewards!
+              {t('home.subtitle')}
             </p>
             <Link to="/scanner">
               <Button size="lg">
                 <ScanLine className="mr-2 h-5 w-5" />
-                Start Scanning
+                {t('home.startScanning')}
               </Button>
             </Link>
           </div>
@@ -50,8 +52,8 @@ const Index = () => {
             <div className="space-y-6">
               <Card className="w-full bg-card/80 backdrop-blur-sm">
                 <CardHeader>
-                  <CardTitle>{user ? "Your Points" : "Your Unsaved Points"}</CardTitle>
-                  {!user && <CardDescription>Log in or sign up to save your progress!</CardDescription>}
+                  <CardTitle>{user ? t('home.yourPoints') : t('home.yourUnsavedPoints')}</CardTitle>
+                  {!user && <CardDescription>{t('home.saveProgress')}</CardDescription>}
                 </CardHeader>
                 <CardContent>
                   <p className="text-5xl font-bold text-primary">{animatedPoints}</p>
@@ -61,13 +63,13 @@ const Index = () => {
               {user && nextReward && (
                 <Card className="w-full bg-card/80 backdrop-blur-sm">
                   <CardHeader>
-                    <CardTitle>Next Reward</CardTitle>
+                    <CardTitle>{t('home.nextReward')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="font-semibold mb-2">{nextReward.name}</p>
                     <Progress value={progress} className="w-full mb-2" />
                     <p className="text-sm text-muted-foreground text-right">
-                      {points}/{nextReward.cost} points
+                      {t('home.pointsProgress', { points: points, cost: nextReward.cost })}
                     </p>
                   </CardContent>
                 </Card>

@@ -14,8 +14,10 @@ import { useRewards } from "@/hooks/useRewards";
 import { getIcon } from "@/lib/icon-map";
 import { Skeleton } from "./ui/skeleton";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const RewardsCarousel = () => {
+  const { t } = useTranslation();
   const { rewards, isLoading } = useRewards();
   const plugin = React.useRef(
     Autoplay({ delay: 3000, stopOnInteraction: true })
@@ -37,7 +39,7 @@ const RewardsCarousel = () => {
 
   return (
     <section className="mt-16 text-center">
-      <h2 className="text-3xl font-bold mb-6">Récompenses en Vedette</h2>
+      <h2 className="text-3xl font-bold mb-6">{t('rewardsCarousel.title')}</h2>
       <Carousel
         plugins={[plugin.current]}
         className="w-full max-w-4xl mx-auto"

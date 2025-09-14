@@ -9,8 +9,10 @@ import { format } from 'date-fns';
 import { useAnimatedCounter } from "@/hooks/useAnimatedCounter";
 import { Badge } from "@/components/ui/badge";
 import Achievements from "@/components/Achievements";
+import { useTranslation } from "react-i18next";
 
 const ProfilePage = () => {
+  const { t } = useTranslation();
   const { user, points } = useAuth();
   const { data: scanHistory, isLoading } = useProfileData();
   const animatedPoints = useAnimatedCounter(points);
@@ -20,14 +22,14 @@ const ProfilePage = () => {
   return (
     <div className="container mx-auto p-4">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold mb-2">Votre Profil</h1>
+        <h1 className="text-3xl font-bold mb-2">{t('profile.title')}</h1>
         <p className="text-lg text-muted-foreground">{user?.email}</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 max-w-2xl mx-auto mb-8">
         <Card className="bg-card/80 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle>Total des Points</CardTitle>
+            <CardTitle>{t('profile.totalPoints')}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-4xl font-bold text-primary">{animatedPoints.toLocaleString()}</p>
@@ -35,7 +37,7 @@ const ProfilePage = () => {
         </Card>
         <Card className="bg-card/80 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle>Bouteilles Recyclées</CardTitle>
+            <CardTitle>{t('profile.bottlesRecycled')}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-4xl font-bold">{totalScans.toLocaleString()}</p>
@@ -47,16 +49,16 @@ const ProfilePage = () => {
 
       <Card className="max-w-4xl mx-auto mt-8 bg-card/80 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle>Activité Récente</CardTitle>
-          <CardDescription>Voici les 20 derniers articles que vous avez recyclés.</CardDescription>
+          <CardTitle>{t('profile.recentActivity')}</CardTitle>
+          <CardDescription>{t('profile.recentActivityDescription')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Code-barres</TableHead>
-                <TableHead className="text-right">Points</TableHead>
+                <TableHead>{t('profile.date')}</TableHead>
+                <TableHead>{t('profile.barcode')}</TableHead>
+                <TableHead className="text-right">{t('profile.points')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
