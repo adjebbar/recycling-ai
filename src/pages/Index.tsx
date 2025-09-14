@@ -12,6 +12,7 @@ import CommunityImpact from "@/components/CommunityImpact";
 import RecyclingBenefits from "@/components/RecyclingBenefits";
 import GettingStarted from "@/components/GettingStarted";
 import { useRewards } from "@/hooks/useRewards";
+import RewardsCarousel from "@/components/RewardsCarousel";
 
 const Index = () => {
   const { user, points } = useAuth();
@@ -79,6 +80,7 @@ const Index = () => {
       {!user && <GettingStarted />}
       <CommunityImpact />
       <RecyclingBenefits />
+      <RewardsCarousel />
     </div>
   );
 };
