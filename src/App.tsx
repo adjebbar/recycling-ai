@@ -14,15 +14,17 @@ import LeaderboardPage from "./pages/Leaderboard";
 import ProfilePage from "./pages/Profile";
 import ChallengesPage from "./pages/Challenges";
 import AdminRoute from "./components/AdminRoute";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import { Navbar } from "./components/Navbar";
 import { ThemeProvider } from "./components/theme-provider";
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
+import { DailyBonus } from "./components/DailyBonus";
 
 const queryClient = new QueryClient();
 
-const App = () => {
+const AppContent = () => {
+  const { user, isBonusModalOpen, claimDailyBonus, closeBonusModal } = useAuth();
   const { i18n } = useTranslation();
 
   useEffect(() => {
@@ -31,6 +33,40 @@ const App = () => {
   }, [i18n, i18n.language]);
 
   return (
+    <>
+      {user && (
+        <DailyBonus
+          isOpen={isBonusModalOpen}
+          onClaim={claimDailyBonus}
+          onClose={closeBonusModal}
+          bonusAmount={20}
+        />
+      )}
+      <Navbar />
+      <main>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/scanner" element={<ScannerPage />} />
+          <Route path="/rewards" element={<RewardsPage />} />
+          <Route path="/leaderboard" element={<LeaderboardPage />} />
+          <Route path="/challenges" element={<ChallengesPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          
+          <Route element={<AdminRoute />}>
+            <Route path="/admin" element={<AdminPage />} />
+          </Route>
+
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </main>
+    </>
+  );
+};
+
+const App = () => {
+  return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
@@ -38,26 +74,7 @@ const App = () => {
           <Sonner />
           <BrowserRouter>
             <AuthProvider>
-              <Navbar />
-              <main>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/scanner" element={<ScannerPage />} />
-                  <Route path="/rewards" element={<RewardsPage />} />
-                  <Route path="/leaderboard" element={<LeaderboardPage />} />
-                  <Route path="/challenges" element={<ChallengesPage />} />
-                  <Route path="/login" element={<LoginPage />} />
-                  <Route path="/signup" element={<SignUpPage />} />
-                  <Route path="/profile" element={<ProfilePage />} />
-                  
-                  <Route element={<AdminRoute />}>
-                    <Route path="/admin" element={<AdminPage />} />
-                  </Route>
-
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </main>
+              <AppContent />
             </AuthProvider>
           </BrowserRouter>
         </ThemeProvider>

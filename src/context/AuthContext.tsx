@@ -4,6 +4,9 @@ import { createContext, useContext, useState, ReactNode, useEffect, useCallback 
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabaseClient';
 import { showError, showSuccess } from '@/utils/toast';
+import { isBefore, startOfToday } from 'date-fns';
+
+const DAILY_BONUS_AMOUNT = 20;
 
 interface AuthContextType {
   session: Session | null;
@@ -11,11 +14,14 @@ interface AuthContextType {
   points: number;
   totalBottlesRecycled: number;
   activeRecyclers: number;
+  isBonusModalOpen: boolean;
   addPoints: (amount: number, barcode?: string) => Promise<void>;
   addBonusPoints: (amount: number) => Promise<void>;
   spendPoints: (amount: number) => Promise<void>;
   resetCommunityStats: () => Promise<void>;
   fetchCommunityStats: () => Promise<void>;
+  claimDailyBonus: () => Promise<void>;
+  closeBonusModal: () => void;
   loading: boolean;
 }
 
@@ -25,6 +31,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isBonusModalOpen, setIsBonusModalOpen] = useState(false);
 
   const [points, setPoints] = useState(0);
   const [anonymousPoints, setAnonymousPoints] = useState(0);
@@ -40,29 +47,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     if (error) {
       console.error('Error fetching community stats:', error.message);
-      // Fail silently instead of showing an error to the user
     } else if (data) {
       setTotalBottlesRecycled(data.total_bottles_recycled);
       setActiveRecyclers(data.active_recyclers);
     }
   }, []);
 
-  const fetchUserPoints = useCallback(async (currentUser: User) => {
+  const fetchUserProfile = useCallback(async (currentUser: User) => {
     const { data, error } = await supabase
       .from('profiles')
-      .select('points')
+      .select('points, last_login')
       .eq('id', currentUser.id)
       .single();
 
     if (error) {
       console.error('Error fetching user profile:', error);
-    } else if (data) {
-      setPoints(data.points);
+      return null;
     }
+    return data;
   }, []);
 
   useEffect(() => {
-    const getSessionAndStats = async () => {
+    const getSessionAndProfile = async () => {
       setLoading(true);
       const { data: { session } } = await supabase.auth.getSession();
       const currentUser = session?.user ?? null;
@@ -70,7 +76,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(currentUser);
 
       if (currentUser) {
-        await fetchUserPoints(currentUser);
+        const profile = await fetchUserProfile(currentUser);
+        if (profile) {
+          setPoints(profile.points);
+          const lastLogin = profile.last_login ? new Date(profile.last_login) : null;
+          if (!lastLogin || isBefore(lastLogin, startOfToday())) {
+            setIsBonusModalOpen(true);
+          }
+        }
       } else {
         const localPoints = Number(localStorage.getItem('anonymousPoints') || '0');
         setAnonymousPoints(localPoints);
@@ -79,28 +92,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false);
     };
 
-    getSessionAndStats();
+    getSessionAndProfile();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       const newUser = session?.user ?? null;
       const oldUser = user;
       
-      if (newUser && !oldUser) { // User logged in
+      if (newUser && !oldUser) {
         const localPoints = Number(localStorage.getItem('anonymousPoints') || '0');
+        const profile = await fetchUserProfile(newUser);
+        let currentPoints = profile?.points || 0;
+
         if (localPoints > 0) {
           showSuccess(`Merging ${localPoints} saved points to your account!`);
-          const { data: profile, error } = await supabase.from('profiles').select('points').eq('id', newUser.id).single();
-          if (profile) {
-            const newTotalPoints = profile.points + localPoints;
-            await supabase.from('profiles').update({ points: newTotalPoints }).eq('id', newUser.id);
-            localStorage.removeItem('anonymousPoints');
-            setAnonymousPoints(0);
-            setPoints(newTotalPoints);
-          }
-        } else {
-          await fetchUserPoints(newUser);
+          currentPoints += localPoints;
+          await supabase.from('profiles').update({ points: currentPoints }).eq('id', newUser.id);
+          localStorage.removeItem('anonymousPoints');
+          setAnonymousPoints(0);
         }
-      } else if (!newUser && oldUser) { // User logged out
+        setPoints(currentPoints);
+        
+        const lastLogin = profile?.last_login ? new Date(profile.last_login) : null;
+        if (!lastLogin || isBefore(lastLogin, startOfToday())) {
+          setIsBonusModalOpen(true);
+        }
+      } else if (!newUser && oldUser) {
         setPoints(0);
       }
       
@@ -108,10 +124,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(newUser);
     });
 
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [fetchCommunityStats, fetchUserPoints, user]);
+    return () => subscription.unsubscribe();
+  }, [fetchCommunityStats, fetchUserProfile, user]);
 
   const addPoints = async (amount: number, barcode?: string) => {
     const originalTotalBottles = totalBottlesRecycled;
@@ -120,7 +134,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (statsError) {
       setTotalBottlesRecycled(originalTotalBottles);
       console.error("Failed to update community stats:", statsError.message);
-      // Fail silently
     }
 
     if (user) {
@@ -146,9 +159,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setPoints(newPoints);
     const { error } = await supabase.from('profiles').update({ points: newPoints }).eq('id', user.id);
     if (error) {
-      setPoints(points); // Revert on failure
+      setPoints(points);
       showError("Failed to claim bonus points.");
       throw error;
+    }
+  };
+
+  const claimDailyBonus = async () => {
+    if (!user) return;
+    try {
+      await addBonusPoints(DAILY_BONUS_AMOUNT);
+      await supabase.from('profiles').update({ last_login: new Date().toISOString() }).eq('id', user.id);
+      showSuccess(`You've claimed your daily bonus of ${DAILY_BONUS_AMOUNT} points!`);
+      setIsBonusModalOpen(false);
+    } catch (error) {
+      showError("Could not claim daily bonus. Please try again.");
     }
   };
 
@@ -174,11 +199,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     points: user ? points : anonymousPoints,
     totalBottlesRecycled,
     activeRecyclers,
+    isBonusModalOpen,
     addPoints,
     addBonusPoints,
     spendPoints,
     resetCommunityStats,
     fetchCommunityStats,
+    claimDailyBonus,
+    closeBonusModal: () => setIsBonusModalOpen(false),
     loading,
   };
 
