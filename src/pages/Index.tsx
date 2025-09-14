@@ -76,7 +76,7 @@ const Index = () => {
       <CommunityImpact />
       <RecyclingBenefits />
 
-      {user && (
+      {user && user.email === 'adjebbar83@gmail.com' && (
         <section className="mt-16">
           <Card className="max-w-2xl mx-auto bg-card/80 backdrop-blur-sm border-destructive">
             <CardHeader>
