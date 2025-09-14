@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { format } from 'date-fns';
 import { useAnimatedCounter } from "@/hooks/useAnimatedCounter";
 import { Badge } from "@/components/ui/badge";
+import Achievements from "@/components/Achievements";
 
 const ProfilePage = () => {
   const { user, points } = useAuth();
@@ -19,14 +20,14 @@ const ProfilePage = () => {
   return (
     <div className="container mx-auto p-4">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold mb-2">Your Profile</h1>
+        <h1 className="text-3xl font-bold mb-2">Votre Profil</h1>
         <p className="text-lg text-muted-foreground">{user?.email}</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 max-w-2xl mx-auto mb-8">
         <Card className="bg-card/80 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle>Total Points</CardTitle>
+            <CardTitle>Total des Points</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-4xl font-bold text-primary">{animatedPoints.toLocaleString()}</p>
@@ -34,7 +35,7 @@ const ProfilePage = () => {
         </Card>
         <Card className="bg-card/80 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle>Bottles Recycled</CardTitle>
+            <CardTitle>Bouteilles Recyclées</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-4xl font-bold">{totalScans.toLocaleString()}</p>
@@ -42,17 +43,19 @@ const ProfilePage = () => {
         </Card>
       </div>
 
-      <Card className="max-w-4xl mx-auto bg-card/80 backdrop-blur-sm">
+      <Achievements points={points} totalScans={totalScans} />
+
+      <Card className="max-w-4xl mx-auto mt-8 bg-card/80 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
-          <CardDescription>Here are the last 20 items you've recycled.</CardDescription>
+          <CardTitle>Activité Récente</CardTitle>
+          <CardDescription>Voici les 20 derniers articles que vous avez recyclés.</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Date</TableHead>
-                <TableHead>Barcode</TableHead>
+                <TableHead>Code-barres</TableHead>
                 <TableHead className="text-right">Points</TableHead>
               </TableRow>
             </TableHeader>
