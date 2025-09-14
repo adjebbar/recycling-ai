@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from 'react';
-import { QrReader } from 'react-qr-reader';
 import { useAuth } from '@/context/AuthContext';
 import { showError, showSuccess, showLoading, dismissToast } from '@/utils/toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +8,7 @@ import { Camera, CameraOff, Keyboard } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import BarcodeScanner from '@/components/BarcodeScanner';
 
 const POINTS_PER_BOTTLE = 10;
 
@@ -44,9 +44,7 @@ const ScannerPage = () => {
   const [manualBarcode, setManualBarcode] = useState('');
 
   const processBarcode = async (barcode: string) => {
-    if (!barcode) return;
-
-    if (barcode === lastScanned) {
+    if (!barcode || barcode === lastScanned) {
       return;
     }
     
@@ -69,7 +67,6 @@ const ScannerPage = () => {
         }
       } else {
         showError('Produit non trouvé dans la base de données.');
-        // Ici, nous ajouterions la logique pour enregistrer le nouveau produit.
       }
     } catch (err) {
       dismissToast(loadingToast);
@@ -77,17 +74,6 @@ const ScannerPage = () => {
       console.error(err);
     } finally {
       setTimeout(() => setLastScanned(null), 3000);
-    }
-  };
-
-  const handleScanResult = (result: any, error: any) => {
-    if (!!result) {
-      const barcode = result.getText();
-      processBarcode(barcode);
-    }
-
-    if (!!error) {
-      // console.info(error);
     }
   };
 
@@ -117,18 +103,8 @@ const ScannerPage = () => {
         </TabsList>
         <TabsContent value="camera">
           <Card className="overflow-hidden bg-card/80 backdrop-blur-sm">
-            <CardContent className="p-0">
-              <QrReader
-                onResult={handleScanResult}
-                constraints={{ facingMode: 'environment' }}
-                videoContainerStyle={{ paddingTop: '75%' }} // 4:3 aspect ratio
-                videoStyle={{ objectFit: 'cover' }}
-                ViewFinder={() => (
-                  <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
-                    <div className="w-3/4 h-1/2 border-4 border-white/50 rounded-lg shadow-lg" />
-                  </div>
-                )}
-              />
+            <CardContent className="p-4">
+              <BarcodeScanner onScanSuccess={processBarcode} />
             </CardContent>
           </Card>
         </TabsContent>
