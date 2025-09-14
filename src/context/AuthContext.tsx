@@ -14,6 +14,7 @@ interface AuthContextType {
   addPoints: (amount: number) => Promise<void>;
   spendPoints: (amount: number) => Promise<void>;
   resetCommunityStats: () => Promise<void>;
+  fetchCommunityStats: () => Promise<void>;
   loading: boolean;
 }
 
@@ -166,12 +167,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     addPoints,
     spendPoints,
     resetCommunityStats,
+    fetchCommunityStats,
     loading,
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 };

@@ -1,20 +1,19 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/context/AuthContext";
 import { rewards } from "@/data/rewards";
 import { useAnimatedCounter } from "@/hooks/useAnimatedCounter";
-import { Recycle, ScanLine, AlertTriangle } from "lucide-react";
+import { Recycle, ScanLine } from "lucide-react";
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import CommunityImpact from "@/components/CommunityImpact";
 import RecyclingBenefits from "@/components/RecyclingBenefits";
-import { showSuccess } from "@/utils/toast";
 
 const Index = () => {
-  const { points, resetCommunityStats, user } = useAuth();
+  const { points } = useAuth();
   const animatedPoints = useAnimatedCounter(points);
 
   const nextReward = useMemo(() => {
@@ -22,11 +21,6 @@ const Index = () => {
   }, [points]);
 
   const progress = nextReward ? (points / nextReward.cost) * 100 : 100;
-
-  const handleReset = async () => {
-    await resetCommunityStats();
-    showSuccess("Community stats have been reset.");
-  };
 
   return (
     <div className="container mx-auto p-4">
@@ -75,27 +69,6 @@ const Index = () => {
 
       <CommunityImpact />
       <RecyclingBenefits />
-
-      {user && user.email === 'adjebbar83@gmail.com' && (
-        <section className="mt-16">
-          <Card className="max-w-2xl mx-auto bg-card/80 backdrop-blur-sm border-destructive">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <AlertTriangle className="mr-2 h-5 w-5 text-destructive" />
-                Admin Panel
-              </CardTitle>
-              <CardDescription>
-                This action is for administrative purposes only and will reset all community statistics.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button variant="destructive" onClick={handleReset}>
-                Reset All Stats
-              </Button>
-            </CardContent>
-          </Card>
-        </section>
-      )}
     </div>
   );
 };

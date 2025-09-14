@@ -1,7 +1,7 @@
 "use client";
 
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Recycle, ScanLine, Trophy, LogOut } from 'lucide-react';
+import { Recycle, ScanLine, Trophy, LogOut, Shield } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { ThemeToggle } from './theme-toggle';
 import { useAnimatedCounter } from '@/hooks/useAnimatedCounter';
@@ -62,6 +62,14 @@ export const Navbar = () => {
               <Badge variant="secondary" className="text-base font-semibold">
                 {animatedPoints} Points
               </Badge>
+              {user.email === 'adjebbar83@gmail.com' && (
+                <Button asChild variant="ghost" size="sm">
+                  <Link to="/admin" className="flex items-center">
+                    <Shield className="mr-2 h-4 w-4" />
+                    Admin
+                  </Link>
+                </Button>
+              )}
               <Button variant="ghost" size="icon" onClick={handleLogout}>
                 <LogOut className="h-5 w-5" />
                 <span className="sr-only">Logout</span>
