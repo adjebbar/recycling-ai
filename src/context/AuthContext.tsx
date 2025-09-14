@@ -12,6 +12,7 @@ interface AuthContextType {
   totalBottlesRecycled: number;
   activeRecyclers: number;
   addPoints: (amount: number, barcode?: string) => Promise<void>;
+  addBonusPoints: (amount: number) => Promise<void>;
   spendPoints: (amount: number) => Promise<void>;
   resetCommunityStats: () => Promise<void>;
   fetchCommunityStats: () => Promise<void>;
@@ -139,6 +140,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const addBonusPoints = async (amount: number) => {
+    if (!user) return;
+    const newPoints = points + amount;
+    setPoints(newPoints);
+    const { error } = await supabase.from('profiles').update({ points: newPoints }).eq('id', user.id);
+    if (error) {
+      setPoints(points); // Revert on failure
+      showError("Failed to claim bonus points.");
+      throw error;
+    }
+  };
+
   const spendPoints = async (amount: number) => {
     if (!user || points < amount) return;
     const newPoints = points - amount;
@@ -162,6 +175,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     totalBottlesRecycled,
     activeRecyclers,
     addPoints,
+    addBonusPoints,
     spendPoints,
     resetCommunityStats,
     fetchCommunityStats,

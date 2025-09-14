@@ -12,6 +12,7 @@ import SignUpPage from "./pages/SignUp";
 import AdminPage from "./pages/Admin";
 import LeaderboardPage from "./pages/Leaderboard";
 import ProfilePage from "./pages/Profile";
+import ChallengesPage from "./pages/Challenges";
 import AdminRoute from "./components/AdminRoute";
 import { AuthProvider } from "./context/AuthContext";
 import { Navbar } from "./components/Navbar";
@@ -44,6 +45,7 @@ const App = () => {
                   <Route path="/scanner" element={<ScannerPage />} />
                   <Route path="/rewards" element={<RewardsPage />} />
                   <Route path="/leaderboard" element={<LeaderboardPage />} />
+                  <Route path="/challenges" element={<ChallengesPage />} />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/signup" element={<SignUpPage />} />
                   <Route path="/profile" element={<ProfilePage />} />
