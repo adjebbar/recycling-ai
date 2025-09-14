@@ -58,7 +58,7 @@ const AdminPage = () => {
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
       
-      <Card className="max-w-4xl mx-auto bg-card/60 backdrop-blur-md">
+      <Card className="max-w-4xl mx-auto bg-card/70 backdrop-blur-lg border">
         <CardHeader>
           <CardTitle>Community Stats Management</CardTitle>
           <CardDescription>
@@ -94,7 +94,7 @@ const AdminPage = () => {
 
       <RewardsManager />
 
-      <Card className="max-w-4xl mx-auto mt-8 bg-card/60 backdrop-blur-md border-destructive">
+      <Card className="max-w-4xl mx-auto mt-8 bg-card/70 backdrop-blur-lg border border-destructive">
         <CardHeader>
           <CardTitle className="flex items-center">
             <AlertTriangle className="mr-2 h-5 w-5 text-destructive" />

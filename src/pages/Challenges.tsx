@@ -22,7 +22,7 @@ const ChallengesPage = () => {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-4xl mx-auto">
         {isLoading ? (
           Array.from({ length: 6 }).map((_, i) => (
-            <Card key={i} className="bg-card/60 backdrop-blur-md">
+            <Card key={i} className="bg-card/70 backdrop-blur-lg border">
               <CardHeader>
                 <Skeleton className="h-6 w-3/4" />
                 <Skeleton className="h-4 w-full mt-2" />
@@ -34,7 +34,7 @@ const ChallengesPage = () => {
           ))
         ) : (
           challenges.map((challenge) => (
-            <Card key={challenge.id} className="flex flex-col bg-card/60 backdrop-blur-md">
+            <Card key={challenge.id} className="flex flex-col bg-card/70 backdrop-blur-lg border">
               <CardHeader className="flex-grow">
                 <CardTitle>{challenge.title}</CardTitle>
                 <CardDescription>{challenge.description}</CardDescription>

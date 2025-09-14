@@ -38,7 +38,7 @@ const ActivityChart = ({ scanHistory }: ActivityChartProps) => {
   }, [scanHistory]);
 
   return (
-    <Card className="max-w-4xl mx-auto mt-8 bg-card/60 backdrop-blur-md">
+    <Card className="max-w-4xl mx-auto mt-8 bg-card/70 backdrop-blur-lg border">
       <CardHeader>
         <CardTitle>Recycling Activity (Last 7 Days)</CardTitle>
       </CardHeader>

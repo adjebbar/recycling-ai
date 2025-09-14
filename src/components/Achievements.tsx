@@ -20,7 +20,7 @@ const Achievements = () => {
   };
 
   return (
-    <Card className="max-w-4xl mx-auto bg-card/60 backdrop-blur-md">
+    <Card className="max-w-4xl mx-auto bg-card/70 backdrop-blur-lg border">
       <CardHeader>
         <CardTitle>{t('profile.achievements')}</CardTitle>
       </CardHeader>
