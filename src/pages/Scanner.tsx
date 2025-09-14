@@ -67,16 +67,20 @@ const ScannerPage = () => {
           showSuccess(`Bouteille en plastique détectée ! +${POINTS_PER_BOTTLE} points.`);
           
           if (!user) {
-            setTimeout(() => {
-              toast.info("Voulez-vous sauvegarder votre progression ?", {
-                description: "Inscrivez-vous pour suivre votre score et obtenir des récompenses.",
-                action: {
-                  label: "S'inscrire",
-                  onClick: () => navigate('/signup'),
-                },
-                duration: 5000,
-              });
-            }, 1500);
+            const hasShownToast = sessionStorage.getItem('signupToastShown');
+            if (!hasShownToast) {
+              setTimeout(() => {
+                toast.info("Voulez-vous sauvegarder votre progression ?", {
+                  description: "Inscrivez-vous pour suivre votre score et obtenir des récompenses.",
+                  action: {
+                    label: "S'inscrire",
+                    onClick: () => navigate('/signup'),
+                  },
+                  duration: 10000, // Increased duration
+                });
+                sessionStorage.setItem('signupToastShown', 'true');
+              }, 1500);
+            }
           }
         } else {
           showError("Cet article n'est pas une bouteille en plastique reconnue.");
