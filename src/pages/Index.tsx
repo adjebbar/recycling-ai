@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/context/AuthContext";
 import { useAnimatedCounter } from "@/hooks/useAnimatedCounter";
@@ -37,32 +37,27 @@ const Index = () => {
             <p className="text-lg md:text-xl text-muted-foreground mb-8">
               Scan plastic bottles, earn points, and redeem exciting rewards!
             </p>
-            <Link to={user ? "/scanner" : "/signup"}>
+            <Link to="/scanner">
               <Button size="lg">
-                {user ? (
-                  <>
-                    <ScanLine className="mr-2 h-5 w-5" />
-                    Start Scanning
-                  </>
-                ) : (
-                  "Get Started"
-                )}
+                <ScanLine className="mr-2 h-5 w-5" />
+                Start Scanning
               </Button>
             </Link>
           </div>
           
-          {user && (
+          {points > 0 && (
             <div className="space-y-6">
               <Card className="w-full bg-card/80 backdrop-blur-sm">
                 <CardHeader>
-                  <CardTitle>Your Points</CardTitle>
+                  <CardTitle>{user ? "Your Points" : "Your Unsaved Points"}</CardTitle>
+                  {!user && <CardDescription>Log in or sign up to save your progress!</CardDescription>}
                 </CardHeader>
                 <CardContent>
                   <p className="text-5xl font-bold text-primary">{animatedPoints}</p>
                 </CardContent>
               </Card>
 
-              {nextReward && (
+              {user && nextReward && (
                 <Card className="w-full bg-card/80 backdrop-blur-sm">
                   <CardHeader>
                     <CardTitle>Next Reward</CardTitle>

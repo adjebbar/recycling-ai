@@ -32,11 +32,32 @@ export const Navbar = () => {
     navigate('/');
   };
 
-  const navLinks = [
+  const publicLinks = [
     { href: '/scanner', label: 'Scan', icon: ScanLine },
+  ];
+
+  const privateLinks = [
     { href: '/rewards', label: 'Rewards', icon: Trophy },
     { href: '/leaderboard', label: 'Leaderboard', icon: BarChart },
   ];
+
+  const renderLink = (link: { href: string, label: string, icon: React.ElementType }) => {
+    const Icon = link.icon;
+    const isActive = location.pathname === link.href;
+    return (
+      <Link
+        key={link.href}
+        to={link.href}
+        className={cn(
+          "flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
+          isActive ? "bg-accent text-accent-foreground" : "text-muted-foreground"
+        )}
+      >
+        <Icon className="mr-2 h-4 w-4" />
+        {link.label}
+      </Link>
+    );
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -48,23 +69,8 @@ export const Navbar = () => {
           </Link>
         </div>
         <nav className="flex flex-1 items-center space-x-2 sm:space-x-4">
-          {user && navLinks.map((link) => {
-            const Icon = link.icon;
-            const isActive = location.pathname === link.href;
-            return (
-              <Link
-                key={link.href}
-                to={link.href}
-                className={cn(
-                  "flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
-                  isActive ? "bg-accent text-accent-foreground" : "text-muted-foreground"
-                )}
-              >
-                <Icon className="mr-2 h-4 w-4" />
-                {link.label}
-              </Link>
-            );
-          })}
+          {publicLinks.map(renderLink)}
+          {user && privateLinks.map(renderLink)}
         </nav>
         <div className="flex items-center justify-end space-x-4">
           {user ? (
@@ -113,14 +119,21 @@ export const Navbar = () => {
               </DropdownMenu>
             </>
           ) : (
-            <div className="space-x-2">
-              <Button asChild variant="ghost">
-                <Link to="/login">Login</Link>
-              </Button>
-              <Button asChild>
-                <Link to="/signup">Sign Up</Link>
-              </Button>
-            </div>
+            <>
+              {points > 0 && (
+                <Badge variant="secondary" className="hidden sm:flex text-base font-semibold">
+                  {animatedPoints} Points
+                </Badge>
+              )}
+              <div className="space-x-2">
+                <Button asChild variant="ghost">
+                  <Link to="/login">Login</Link>
+                </Button>
+                <Button asChild>
+                  <Link to="/signup">Sign Up</Link>
+                </Button>
+              </div>
+            </>
           )}
           <ThemeToggle />
         </div>
