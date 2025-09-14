@@ -10,6 +10,7 @@ import RewardsPage from "./pages/Rewards";
 import LoginPage from "./pages/Login";
 import SignUpPage from "./pages/SignUp";
 import AdminPage from "./pages/Admin";
+import LeaderboardPage from "./pages/Leaderboard";
 import AdminRoute from "./components/AdminRoute";
 import { AuthProvider } from "./context/AuthContext";
 import { Navbar } from "./components/Navbar";
@@ -31,6 +32,7 @@ const App = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/scanner" element={<ScannerPage />} />
                 <Route path="/rewards" element={<RewardsPage />} />
+                <Route path="/leaderboard" element={<LeaderboardPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignUpPage />} />
                 

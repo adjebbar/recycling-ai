@@ -88,7 +88,7 @@ const RewardsManager = () => {
     if (editingReward) {
       await updateReward({ ...editingReward, ...values });
     } else {
-      await addReward(values);
+      await addReward({ ...values });
     }
     setIsDialogOpen(false);
   };

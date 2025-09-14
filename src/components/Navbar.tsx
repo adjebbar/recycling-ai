@@ -1,7 +1,7 @@
 "use client";
 
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Recycle, ScanLine, Trophy, LogOut, Shield } from 'lucide-react';
+import { Recycle, ScanLine, Trophy, LogOut, Shield, BarChart } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { ThemeToggle } from './theme-toggle';
 import { useAnimatedCounter } from '@/hooks/useAnimatedCounter';
@@ -26,6 +26,7 @@ export const Navbar = () => {
   const navLinks = [
     { href: '/scanner', label: 'Scan', icon: ScanLine },
     { href: '/rewards', label: 'Rewards', icon: Trophy },
+    { href: '/leaderboard', label: 'Leaderboard', icon: BarChart },
   ];
 
   return (
