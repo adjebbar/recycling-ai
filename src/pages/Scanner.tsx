@@ -15,26 +15,46 @@ import { useTranslation } from 'react-i18next';
 
 const POINTS_PER_BOTTLE = 10;
 
-interface Packaging {
-  material?: string;
-  shape?: string;
-}
+const isPlasticBottle = (product: {
+  packaging_tags?: string[];
+  packaging?: string;
+  packagings?: { material?: string; shape?: string }[];
+}): boolean => {
+  if (!product) return false;
 
-const isPlasticBottle = (packagings: Packaging[]): boolean => {
-  if (!packagings || packagings.length === 0) {
-    return false;
-  }
+  const tags = product.packaging_tags?.map(t => t.toLowerCase()) || [];
+  const packagingString = (product.packaging || '').toLowerCase();
+  const packagingsArray = product.packagings || [];
 
-  return packagings.some(pkg => {
-    const shape = pkg.shape?.toLowerCase() || '';
-    const material = pkg.material?.toLowerCase() || '';
+  const bottleKeywords = ['bottle', 'bouteille'];
+  const plasticKeywords = ['plastic', 'plastique', 'pet', 'hdpe'];
+  const glassKeywords = ['glass', 'verre'];
 
-    const isBottleShape = shape.includes('bottle') || shape.includes('bouteille');
-    const isPlasticMaterial = material.includes('plastic') || material.includes('pet') || material.includes('hdpe');
-    const isNotGlass = !material.includes('glass') && !material.includes('verre');
+  const isBottle = 
+    tags.some(tag => bottleKeywords.some(kw => tag.includes(kw))) ||
+    bottleKeywords.some(kw => packagingString.includes(kw)) ||
+    packagingsArray.some(p => {
+      const shape = (p.shape || '').toLowerCase();
+      return bottleKeywords.some(kw => shape.includes(kw));
+    });
 
-    return isBottleShape && isPlasticMaterial && isNotGlass;
-  });
+  const isPlastic = 
+    tags.some(tag => plasticKeywords.some(kw => tag.includes(kw))) ||
+    plasticKeywords.some(kw => packagingString.includes(kw)) ||
+    packagingsArray.some(p => {
+      const material = (p.material || '').toLowerCase();
+      return plasticKeywords.some(kw => material.includes(kw));
+    });
+
+  const isNotGlass = 
+    !tags.some(tag => glassKeywords.some(kw => tag.includes(kw))) &&
+    !glassKeywords.some(kw => packagingString.includes(kw)) &&
+    !packagingsArray.some(p => {
+      const material = (p.material || '').toLowerCase();
+      return glassKeywords.some(kw => material.includes(kw));
+    });
+
+  return isBottle && isPlastic && isNotGlass;
 };
 
 
@@ -60,8 +80,7 @@ const ScannerPage = () => {
       dismissToast(loadingToast);
 
       if (data.status === 1 && data.product) {
-        const packagings = data.product.packagings || [];
-        if (isPlasticBottle(packagings)) {
+        if (isPlasticBottle(data.product)) {
           await addPoints(POINTS_PER_BOTTLE, barcode);
           showSuccess(t('scanner.success', { points: POINTS_PER_BOTTLE }));
           
