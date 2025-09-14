@@ -17,7 +17,12 @@
     --primary-foreground: 355.7 100% 97.3%;
 
     --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222 47% 11.2%;
+    --secondary-foreground: 222 4<think>**Adjusting Background Implementation**
+
+I'm now implementing the new `globals.css` file to fix the UI visibility issues. I've moved the background image to the `html` tag and given the `body` a semi-transparent background color. The `body` now has the `bg-background/95` class. I've removed the old `body::before` code. This creates a solid backdrop for all content, including text and transparent elements, improving readability while retaining the background image's aesthetic.
+
+
+</think>7% 11.2%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
@@ -89,27 +94,17 @@
     @apply border-border;
   }
 
-  body {
-    @apply text-foreground;
-    position: relative;
-  }
-
-  body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
+  html {
     background-image: url('/recycle-background.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    opacity: 0.2;
-    z-index: -1;
+    background-attachment: fixed;
+    height: 100%;
   }
 
-  .dark body::before {
-    opacity: 0.15;
+  body {
+    @apply bg-background/95 text-foreground;
+    min-height: 100%;
   }
 }
