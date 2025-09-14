@@ -11,7 +11,7 @@ const LandingHeader = () => (
     <div className="container mx-auto flex justify-between items-center px-4">
       <Link to="/" className="flex items-center space-x-2">
         <Recycle className="h-8 w-8 text-primary" />
-        <span className="text-2xl font-bold text-gray-800">RecycleApp</span>
+        <span className="text-2xl font-bold text-foreground">EcoScan AI</span>
       </Link>
       <div className="space-x-2">
         <Button asChild variant="ghost">
@@ -47,7 +47,7 @@ const FeatureCard = ({ icon: Icon, title, description, delay }: FeatureCardProps
 
 const LandingPage = () => {
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-green-50 via-white to-cyan-50 text-gray-800 overflow-x-hidden">
+    <div className="min-h-screen w-full text-foreground overflow-x-hidden">
       <LandingHeader />
       <main>
         {/* Hero Section */}
