@@ -11,7 +11,7 @@ interface AuthContextType {
   points: number;
   totalBottlesRecycled: number;
   activeRecyclers: number;
-  addPoints: (amount: number) => Promise<void>;
+  addPoints: (amount: number, barcode?: string) => Promise<void>;
   spendPoints: (amount: number) => Promise<void>;
   resetCommunityStats: () => Promise<void>;
   fetchCommunityStats: () => Promise<void>;
@@ -88,34 +88,48 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [fetchCommunityStats]);
 
-  const addPoints = async (amount: number) => {
+  const addPoints = async (amount: number, barcode?: string) => {
     if (!user) return;
 
+    // Optimistically update points
     const newPoints = points + amount;
     setPoints(newPoints);
 
+    // Update profile points
     const { error: profileError } = await supabase
       .from('profiles')
       .update({ points: newPoints })
       .eq('id', user.id);
 
     if (profileError) {
-      setPoints(points);
+      setPoints(points); // Revert optimistic update
       showError("Failed to update your points.");
       console.error(profileError);
       return;
     }
 
+    // Log the scan in the history table
+    const { error: historyError } = await supabase
+      .from('scan_history')
+      .insert({ user_id: user.id, points_earned: amount, product_barcode: barcode });
+
+    if (historyError) {
+      console.error("Failed to log scan history:", historyError);
+      // Not showing an error to the user as the main action (points) succeeded.
+    }
+
+    // Optimistically update community stats
     const newTotalBottles = totalBottlesRecycled + 1;
     setTotalBottlesRecycled(newTotalBottles);
 
+    // Update community stats
     const { error: statsError } = await supabase
       .from('community_stats')
       .update({ total_bottles_recycled: newTotalBottles })
       .eq('id', 1);
     
     if (statsError) {
-      setTotalBottlesRecycled(totalBottlesRecycled);
+      setTotalBottlesRecycled(totalBottlesRecycled); // Revert
       showError("Failed to update community stats.");
       console.error(statsError);
     }

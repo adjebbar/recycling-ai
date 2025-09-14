@@ -11,6 +11,7 @@ import LoginPage from "./pages/Login";
 import SignUpPage from "./pages/SignUp";
 import AdminPage from "./pages/Admin";
 import LeaderboardPage from "./pages/Leaderboard";
+import ProfilePage from "./pages/Profile";
 import AdminRoute from "./components/AdminRoute";
 import { AuthProvider } from "./context/AuthContext";
 import { Navbar } from "./components/Navbar";
@@ -35,6 +36,7 @@ const App = () => (
                 <Route path="/leaderboard" element={<LeaderboardPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignUpPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
                 
                 <Route element={<AdminRoute />}>
                   <Route path="/admin" element={<AdminPage />} />

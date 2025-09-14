@@ -1,7 +1,7 @@
 "use client";
 
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Recycle, ScanLine, Trophy, LogOut, Shield, BarChart } from 'lucide-react';
+import { Recycle, ScanLine, Trophy, LogOut, Shield, BarChart, User as UserIcon } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { ThemeToggle } from './theme-toggle';
 import { useAnimatedCounter } from '@/hooks/useAnimatedCounter';
@@ -10,6 +10,15 @@ import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
 import { supabase } from '@/lib/supabaseClient';
 import { showSuccess } from '@/utils/toast';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export const Navbar = () => {
   const { user, points } = useAuth();
@@ -39,7 +48,7 @@ export const Navbar = () => {
           </Link>
         </div>
         <nav className="flex flex-1 items-center space-x-2 sm:space-x-4">
-          {navLinks.map((link) => {
+          {user && navLinks.map((link) => {
             const Icon = link.icon;
             const isActive = location.pathname === link.href;
             return (
@@ -60,21 +69,48 @@ export const Navbar = () => {
         <div className="flex items-center justify-end space-x-4">
           {user ? (
             <>
-              <Badge variant="secondary" className="text-base font-semibold">
+              <Badge variant="secondary" className="hidden sm:flex text-base font-semibold">
                 {animatedPoints} Points
               </Badge>
-              {user.email === 'adjebbar83@gmail.com' && (
-                <Button asChild variant="ghost" size="sm">
-                  <Link to="/admin" className="flex items-center">
-                    <Shield className="mr-2 h-4 w-4" />
-                    Admin
-                  </Link>
-                </Button>
-              )}
-              <Button variant="ghost" size="icon" onClick={handleLogout}>
-                <LogOut className="h-5 w-5" />
-                <span className="sr-only">Logout</span>
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback>{user.email?.[0].toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">My Account</p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        {user.email}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile">
+                      <UserIcon className="mr-2 h-4 w-4" />
+                      <span>Profile</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  {user.email === 'adjebbar83@gmail.com' && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin">
+                        <Shield className="mr-2 h-4 w-4" />
+                        <span>Admin</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </>
           ) : (
             <div className="space-x-2">
